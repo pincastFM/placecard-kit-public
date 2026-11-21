@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "rootDir": "."
+  },
+  "include": ["contract/**/*.ts", "planner/**/*.ts", "arrival/**/*.ts"],
+  "exclude": ["node_modules", "**/.pinned/**", "planner/test/**", "arrival/test/**"]
+}

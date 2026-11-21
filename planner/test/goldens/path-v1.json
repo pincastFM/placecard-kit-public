@@ -1,0 +1,2727 @@
+{
+  "source": "Treehopper 1947477",
+  "cases": [
+    {
+      "name": "open, planned, 30 min, on the estimate",
+      "streetCalls": 0,
+      "result": {
+        "record": {
+          "id": "plan-01",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "open",
+            "at": null,
+            "name": null
+          },
+          "mode": "walk",
+          "minutes": 30,
+          "order": "planned",
+          "stops": [
+            {
+              "n": 1,
+              "card": "Ginkgo",
+              "place": {
+                "id": "tree:105",
+                "lat": 40.735884,
+                "lon": -73.989108
+              },
+              "leg": {
+                "m": 218,
+                "min": 2.7
+              },
+              "arriveMin": 2.7,
+              "status": "planned"
+            },
+            {
+              "n": 2,
+              "card": "Silver linden",
+              "place": {
+                "id": "tree:120",
+                "lat": 40.736407,
+                "lon": -73.987625
+              },
+              "leg": {
+                "m": 179,
+                "min": 2.2
+              },
+              "arriveMin": 6,
+              "status": "planned"
+            },
+            {
+              "n": 3,
+              "card": "Red maple",
+              "place": {
+                "id": "tree:113",
+                "lat": 40.739403,
+                "lon": -73.989016
+              },
+              "leg": {
+                "m": 457,
+                "min": 5.7
+              },
+              "arriveMin": 12.7,
+              "status": "planned"
+            },
+            {
+              "n": 4,
+              "card": "Amur maackia",
+              "place": {
+                "id": "tree:132",
+                "lat": 40.740315,
+                "lon": -73.989011
+              },
+              "leg": {
+                "m": 131,
+                "min": 1.6
+              },
+              "arriveMin": 15.3,
+              "status": "planned"
+            },
+            {
+              "n": 5,
+              "card": "Sophora",
+              "place": {
+                "id": "tree:115",
+                "lat": 40.739993,
+                "lon": -73.991174
+              },
+              "leg": {
+                "m": 242,
+                "min": 3
+              },
+              "arriveMin": 19.3,
+              "status": "planned"
+            },
+            {
+              "n": 6,
+              "card": "Callery pear",
+              "place": {
+                "id": "tree:103",
+                "lat": 40.741205,
+                "lon": -73.991879
+              },
+              "leg": {
+                "m": 191,
+                "min": 2.4
+              },
+              "arriveMin": 22.7,
+              "status": "planned"
+            }
+          ],
+          "finish": null,
+          "totals": {
+            "stops": 6,
+            "m": 1418,
+            "walkMin": 17.7,
+            "totalMin": 23.7,
+            "timing": "estimate"
+          },
+          "leftOver": 12
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.989108,
+            40.735884
+          ],
+          [
+            -73.987625,
+            40.736407
+          ],
+          [
+            -73.989016,
+            40.739403
+          ],
+          [
+            -73.989011,
+            40.740315
+          ],
+          [
+            -73.991174,
+            40.739993
+          ],
+          [
+            -73.991879,
+            40.741205
+          ]
+        ]
+      }
+    },
+    {
+      "name": "open, planned, 30 min, streets at 1.1",
+      "streetCalls": 1,
+      "result": {
+        "record": {
+          "id": "plan-02",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "open",
+            "at": null,
+            "name": null
+          },
+          "mode": "walk",
+          "minutes": 30,
+          "order": "planned",
+          "stops": [
+            {
+              "n": 1,
+              "card": "Ginkgo",
+              "place": {
+                "id": "tree:105",
+                "lat": 40.735884,
+                "lon": -73.989108
+              },
+              "leg": {
+                "m": 240,
+                "min": 3
+              },
+              "arriveMin": 3,
+              "status": "planned"
+            },
+            {
+              "n": 2,
+              "card": "Silver linden",
+              "place": {
+                "id": "tree:120",
+                "lat": 40.736407,
+                "lon": -73.987625
+              },
+              "leg": {
+                "m": 197,
+                "min": 2.5
+              },
+              "arriveMin": 6.5,
+              "status": "planned"
+            },
+            {
+              "n": 3,
+              "card": "Red maple",
+              "place": {
+                "id": "tree:113",
+                "lat": 40.739403,
+                "lon": -73.989016
+              },
+              "leg": {
+                "m": 502,
+                "min": 6.3
+              },
+              "arriveMin": 13.7,
+              "status": "planned"
+            },
+            {
+              "n": 4,
+              "card": "Amur maackia",
+              "place": {
+                "id": "tree:132",
+                "lat": 40.740315,
+                "lon": -73.989011
+              },
+              "leg": {
+                "m": 144,
+                "min": 1.8
+              },
+              "arriveMin": 16.5,
+              "status": "planned"
+            },
+            {
+              "n": 5,
+              "card": "Sophora",
+              "place": {
+                "id": "tree:115",
+                "lat": 40.739993,
+                "lon": -73.991174
+              },
+              "leg": {
+                "m": 266,
+                "min": 3.3
+              },
+              "arriveMin": 20.9,
+              "status": "planned"
+            },
+            {
+              "n": 6,
+              "card": "Callery pear",
+              "place": {
+                "id": "tree:103",
+                "lat": 40.741205,
+                "lon": -73.991879
+              },
+              "leg": {
+                "m": 210,
+                "min": 2.6
+              },
+              "arriveMin": 24.5,
+              "status": "planned"
+            }
+          ],
+          "finish": null,
+          "totals": {
+            "stops": 6,
+            "m": 1559,
+            "walkMin": 19.5,
+            "totalMin": 25.5,
+            "timing": "mapbox"
+          },
+          "leftOver": 12
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.989108,
+            40.735884
+          ],
+          [
+            -73.987625,
+            40.736407
+          ],
+          [
+            -73.989016,
+            40.739403
+          ],
+          [
+            -73.989011,
+            40.740315
+          ],
+          [
+            -73.991174,
+            40.739993
+          ],
+          [
+            -73.991879,
+            40.741205
+          ]
+        ]
+      }
+    },
+    {
+      "name": "open, planned, 20 min, a barrier every fourth leg",
+      "streetCalls": 3,
+      "result": {
+        "record": {
+          "id": "plan-03",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "open",
+            "at": null,
+            "name": null
+          },
+          "mode": "walk",
+          "minutes": 20,
+          "order": "planned",
+          "stops": [
+            {
+              "n": 1,
+              "card": "Ginkgo",
+              "place": {
+                "id": "tree:105",
+                "lat": 40.735884,
+                "lon": -73.989108
+              },
+              "leg": {
+                "m": 306,
+                "min": 3.8
+              },
+              "arriveMin": 3.8,
+              "status": "planned"
+            },
+            {
+              "n": 2,
+              "card": "Amur maackia",
+              "place": {
+                "id": "tree:132",
+                "lat": 40.740315,
+                "lon": -73.989011
+              },
+              "leg": {
+                "m": 892,
+                "min": 11.1
+              },
+              "arriveMin": 16,
+              "status": "planned"
+            }
+          ],
+          "finish": null,
+          "totals": {
+            "stops": 2,
+            "m": 1197,
+            "walkMin": 15,
+            "totalMin": 17,
+            "timing": "mapbox"
+          },
+          "leftOver": 16
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.989108,
+            40.735884
+          ],
+          [
+            -73.989011,
+            40.740315
+          ]
+        ]
+      }
+    },
+    {
+      "name": "open, planned, untimed",
+      "streetCalls": 0,
+      "result": {
+        "record": {
+          "id": "plan-04",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "open",
+            "at": null,
+            "name": null
+          },
+          "mode": "walk",
+          "minutes": null,
+          "order": "planned",
+          "stops": [
+            {
+              "n": 1,
+              "card": "Ginkgo",
+              "place": {
+                "id": "tree:105",
+                "lat": 40.735884,
+                "lon": -73.989108
+              },
+              "leg": {
+                "m": 218,
+                "min": 2.7
+              },
+              "arriveMin": 2.7,
+              "status": "planned"
+            },
+            {
+              "n": 2,
+              "card": "Silver linden",
+              "place": {
+                "id": "tree:120",
+                "lat": 40.736407,
+                "lon": -73.987625
+              },
+              "leg": {
+                "m": 179,
+                "min": 2.2
+              },
+              "arriveMin": 6,
+              "status": "planned"
+            },
+            {
+              "n": 3,
+              "card": "Red maple",
+              "place": {
+                "id": "tree:113",
+                "lat": 40.739403,
+                "lon": -73.989016
+              },
+              "leg": {
+                "m": 457,
+                "min": 5.7
+              },
+              "arriveMin": 12.7,
+              "status": "planned"
+            },
+            {
+              "n": 4,
+              "card": "Amur maackia",
+              "place": {
+                "id": "tree:132",
+                "lat": 40.740315,
+                "lon": -73.989011
+              },
+              "leg": {
+                "m": 131,
+                "min": 1.6
+              },
+              "arriveMin": 15.3,
+              "status": "planned"
+            },
+            {
+              "n": 5,
+              "card": "Sophora",
+              "place": {
+                "id": "tree:115",
+                "lat": 40.739993,
+                "lon": -73.991174
+              },
+              "leg": {
+                "m": 242,
+                "min": 3
+              },
+              "arriveMin": 19.3,
+              "status": "planned"
+            },
+            {
+              "n": 6,
+              "card": "Callery pear",
+              "place": {
+                "id": "tree:103",
+                "lat": 40.741205,
+                "lon": -73.991879
+              },
+              "leg": {
+                "m": 191,
+                "min": 2.4
+              },
+              "arriveMin": 22.7,
+              "status": "planned"
+            },
+            {
+              "n": 7,
+              "card": "Cherry",
+              "place": {
+                "id": "tree:117",
+                "lat": 40.742528,
+                "lon": -73.988121
+              },
+              "leg": {
+                "m": 454,
+                "min": 5.7
+              },
+              "arriveMin": 29.4,
+              "status": "planned"
+            },
+            {
+              "n": 8,
+              "card": "London planetree",
+              "place": {
+                "id": "tree:101",
+                "lat": 40.740849,
+                "lon": -73.983583
+              },
+              "leg": {
+                "m": 553,
+                "min": 6.9
+              },
+              "arriveMin": 37.3,
+              "status": "planned"
+            },
+            {
+              "n": 9,
+              "card": "Japanese zelkova",
+              "place": {
+                "id": "tree:107",
+                "lat": 40.738287,
+                "lon": -73.984227
+              },
+              "leg": {
+                "m": 375,
+                "min": 4.7
+              },
+              "arriveMin": 43,
+              "status": "planned"
+            },
+            {
+              "n": 10,
+              "card": "Littleleaf linden",
+              "place": {
+                "id": "tree:110",
+                "lat": 40.733229,
+                "lon": -73.98348
+              },
+              "leg": {
+                "m": 731,
+                "min": 9.1
+              },
+              "arriveMin": 53.1,
+              "status": "planned"
+            },
+            {
+              "n": 11,
+              "card": "Kentucky coffeetree",
+              "place": {
+                "id": "tree:130",
+                "lat": 40.729159,
+                "lon": -73.990078
+              },
+              "leg": {
+                "m": 930,
+                "min": 11.6
+              },
+              "arriveMin": 65.8,
+              "status": "planned"
+            },
+            {
+              "n": 12,
+              "card": "Norway maple",
+              "place": {
+                "id": "tree:114",
+                "lat": 40.733347,
+                "lon": -73.992485
+              },
+              "leg": {
+                "m": 657,
+                "min": 8.2
+              },
+              "arriveMin": 75,
+              "status": "planned"
+            },
+            {
+              "n": 13,
+              "card": "Pin oak",
+              "place": {
+                "id": "tree:100",
+                "lat": 40.734117,
+                "lon": -73.992686
+              },
+              "leg": {
+                "m": 113,
+                "min": 1.4
+              },
+              "arriveMin": 77.4,
+              "status": "planned"
+            },
+            {
+              "n": 14,
+              "card": "Hedge maple",
+              "place": {
+                "id": "tree:124",
+                "lat": 40.733929,
+                "lon": -73.994337
+              },
+              "leg": {
+                "m": 183,
+                "min": 2.3
+              },
+              "arriveMin": 80.7,
+              "status": "planned"
+            },
+            {
+              "n": 15,
+              "card": "Swamp white oak",
+              "place": {
+                "id": "tree:127",
+                "lat": 40.733648,
+                "lon": -73.994821
+              },
+              "leg": {
+                "m": 67,
+                "min": 0.8
+              },
+              "arriveMin": 82.5,
+              "status": "planned"
+            },
+            {
+              "n": 16,
+              "card": "American elm",
+              "place": {
+                "id": "tree:118",
+                "lat": 40.734449,
+                "lon": -73.995477
+              },
+              "leg": {
+                "m": 136,
+                "min": 1.7
+              },
+              "arriveMin": 85.2,
+              "status": "planned"
+            },
+            {
+              "n": 17,
+              "card": "Honeylocust",
+              "place": {
+                "id": "tree:102",
+                "lat": 40.734777,
+                "lon": -73.994628
+              },
+              "leg": {
+                "m": 104,
+                "min": 1.3
+              },
+              "arriveMin": 87.5,
+              "status": "planned"
+            },
+            {
+              "n": 18,
+              "card": "Sweetgum",
+              "place": {
+                "id": "tree:128",
+                "lat": 40.735944,
+                "lon": -73.994594
+              },
+              "leg": {
+                "m": 168,
+                "min": 2.1
+              },
+              "arriveMin": 90.6,
+              "status": "planned"
+            }
+          ],
+          "finish": null,
+          "totals": {
+            "stops": 18,
+            "m": 5889,
+            "walkMin": 73.6,
+            "totalMin": 91.6,
+            "timing": "estimate"
+          },
+          "leftOver": 0
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.989108,
+            40.735884
+          ],
+          [
+            -73.987625,
+            40.736407
+          ],
+          [
+            -73.989016,
+            40.739403
+          ],
+          [
+            -73.989011,
+            40.740315
+          ],
+          [
+            -73.991174,
+            40.739993
+          ],
+          [
+            -73.991879,
+            40.741205
+          ],
+          [
+            -73.988121,
+            40.742528
+          ],
+          [
+            -73.983583,
+            40.740849
+          ],
+          [
+            -73.984227,
+            40.738287
+          ],
+          [
+            -73.98348,
+            40.733229
+          ],
+          [
+            -73.990078,
+            40.729159
+          ],
+          [
+            -73.992485,
+            40.733347
+          ],
+          [
+            -73.992686,
+            40.734117
+          ],
+          [
+            -73.994337,
+            40.733929
+          ],
+          [
+            -73.994821,
+            40.733648
+          ],
+          [
+            -73.995477,
+            40.734449
+          ],
+          [
+            -73.994628,
+            40.734777
+          ],
+          [
+            -73.994594,
+            40.735944
+          ]
+        ]
+      }
+    },
+    {
+      "name": "back to the start, planned, 45 min, on the estimate",
+      "streetCalls": 0,
+      "result": {
+        "record": {
+          "id": "plan-05",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "start",
+            "at": {
+              "lat": 40.7359,
+              "lon": -73.9911
+            },
+            "name": null
+          },
+          "mode": "walk",
+          "minutes": 45,
+          "order": "planned",
+          "stops": [
+            {
+              "n": 1,
+              "card": "Silver linden",
+              "place": {
+                "id": "tree:120",
+                "lat": 40.736407,
+                "lon": -73.987625
+              },
+              "leg": {
+                "m": 388,
+                "min": 4.8
+              },
+              "arriveMin": 4.8,
+              "status": "planned"
+            },
+            {
+              "n": 2,
+              "card": "Ginkgo",
+              "place": {
+                "id": "tree:105",
+                "lat": 40.735884,
+                "lon": -73.989108
+              },
+              "leg": {
+                "m": 179,
+                "min": 2.2
+              },
+              "arriveMin": 8.1,
+              "status": "planned"
+            },
+            {
+              "n": 3,
+              "card": "Norway maple",
+              "place": {
+                "id": "tree:114",
+                "lat": 40.733347,
+                "lon": -73.992485
+              },
+              "leg": {
+                "m": 520,
+                "min": 6.5
+              },
+              "arriveMin": 15.6,
+              "status": "planned"
+            },
+            {
+              "n": 4,
+              "card": "Swamp white oak",
+              "place": {
+                "id": "tree:127",
+                "lat": 40.733648,
+                "lon": -73.994821
+              },
+              "leg": {
+                "m": 260,
+                "min": 3.2
+              },
+              "arriveMin": 19.8,
+              "status": "planned"
+            },
+            {
+              "n": 5,
+              "card": "Hedge maple",
+              "place": {
+                "id": "tree:124",
+                "lat": 40.733929,
+                "lon": -73.994337
+              },
+              "leg": {
+                "m": 67,
+                "min": 0.8
+              },
+              "arriveMin": 21.7,
+              "status": "planned"
+            },
+            {
+              "n": 6,
+              "card": "American elm",
+              "place": {
+                "id": "tree:118",
+                "lat": 40.734449,
+                "lon": -73.995477
+              },
+              "leg": {
+                "m": 146,
+                "min": 1.8
+              },
+              "arriveMin": 24.5,
+              "status": "planned"
+            },
+            {
+              "n": 7,
+              "card": "Honeylocust",
+              "place": {
+                "id": "tree:102",
+                "lat": 40.734777,
+                "lon": -73.994628
+              },
+              "leg": {
+                "m": 104,
+                "min": 1.3
+              },
+              "arriveMin": 26.8,
+              "status": "planned"
+            },
+            {
+              "n": 8,
+              "card": "Sweetgum",
+              "place": {
+                "id": "tree:128",
+                "lat": 40.735944,
+                "lon": -73.994594
+              },
+              "leg": {
+                "m": 168,
+                "min": 2.1
+              },
+              "arriveMin": 29.9,
+              "status": "planned"
+            },
+            {
+              "n": 9,
+              "card": "Pin oak",
+              "place": {
+                "id": "tree:100",
+                "lat": 40.734117,
+                "lon": -73.992686
+              },
+              "leg": {
+                "m": 336,
+                "min": 4.2
+              },
+              "arriveMin": 35.1,
+              "status": "planned"
+            }
+          ],
+          "finish": {
+            "leg": {
+              "m": 310,
+              "min": 3.9
+            },
+            "arriveMin": 40
+          },
+          "totals": {
+            "stops": 9,
+            "m": 2476,
+            "walkMin": 31,
+            "totalMin": 40,
+            "timing": "estimate"
+          },
+          "leftOver": 9
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.987625,
+            40.736407
+          ],
+          [
+            -73.989108,
+            40.735884
+          ],
+          [
+            -73.992485,
+            40.733347
+          ],
+          [
+            -73.994821,
+            40.733648
+          ],
+          [
+            -73.994337,
+            40.733929
+          ],
+          [
+            -73.995477,
+            40.734449
+          ],
+          [
+            -73.994628,
+            40.734777
+          ],
+          [
+            -73.994594,
+            40.735944
+          ],
+          [
+            -73.992686,
+            40.734117
+          ],
+          [
+            -73.9911,
+            40.7359
+          ]
+        ]
+      }
+    },
+    {
+      "name": "back to the start, planned, 45 min, streets at 1.5",
+      "streetCalls": 2,
+      "result": {
+        "record": {
+          "id": "plan-06",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "start",
+            "at": {
+              "lat": 40.7359,
+              "lon": -73.9911
+            },
+            "name": null
+          },
+          "mode": "walk",
+          "minutes": 45,
+          "order": "planned",
+          "stops": [
+            {
+              "n": 1,
+              "card": "Norway maple",
+              "place": {
+                "id": "tree:114",
+                "lat": 40.733347,
+                "lon": -73.992485
+              },
+              "leg": {
+                "m": 596,
+                "min": 7.4
+              },
+              "arriveMin": 7.4,
+              "status": "planned"
+            },
+            {
+              "n": 2,
+              "card": "Swamp white oak",
+              "place": {
+                "id": "tree:127",
+                "lat": 40.733648,
+                "lon": -73.994821
+              },
+              "leg": {
+                "m": 390,
+                "min": 4.9
+              },
+              "arriveMin": 13.3,
+              "status": "planned"
+            },
+            {
+              "n": 3,
+              "card": "Hedge maple",
+              "place": {
+                "id": "tree:124",
+                "lat": 40.733929,
+                "lon": -73.994337
+              },
+              "leg": {
+                "m": 100,
+                "min": 1.3
+              },
+              "arriveMin": 15.6,
+              "status": "planned"
+            },
+            {
+              "n": 4,
+              "card": "American elm",
+              "place": {
+                "id": "tree:118",
+                "lat": 40.734449,
+                "lon": -73.995477
+              },
+              "leg": {
+                "m": 218,
+                "min": 2.7
+              },
+              "arriveMin": 19.3,
+              "status": "planned"
+            },
+            {
+              "n": 5,
+              "card": "Honeylocust",
+              "place": {
+                "id": "tree:102",
+                "lat": 40.734777,
+                "lon": -73.994628
+              },
+              "leg": {
+                "m": 157,
+                "min": 2
+              },
+              "arriveMin": 22.3,
+              "status": "planned"
+            },
+            {
+              "n": 6,
+              "card": "Sweetgum",
+              "place": {
+                "id": "tree:128",
+                "lat": 40.735944,
+                "lon": -73.994594
+              },
+              "leg": {
+                "m": 252,
+                "min": 3.1
+              },
+              "arriveMin": 26.4,
+              "status": "planned"
+            },
+            {
+              "n": 7,
+              "card": "Pin oak",
+              "place": {
+                "id": "tree:100",
+                "lat": 40.734117,
+                "lon": -73.992686
+              },
+              "leg": {
+                "m": 504,
+                "min": 6.3
+              },
+              "arriveMin": 33.7,
+              "status": "planned"
+            }
+          ],
+          "finish": {
+            "leg": {
+              "m": 465,
+              "min": 5.8
+            },
+            "arriveMin": 40.5
+          },
+          "totals": {
+            "stops": 7,
+            "m": 2680,
+            "walkMin": 33.5,
+            "totalMin": 40.5,
+            "timing": "mapbox"
+          },
+          "leftOver": 11
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.992485,
+            40.733347
+          ],
+          [
+            -73.994821,
+            40.733648
+          ],
+          [
+            -73.994337,
+            40.733929
+          ],
+          [
+            -73.995477,
+            40.734449
+          ],
+          [
+            -73.994628,
+            40.734777
+          ],
+          [
+            -73.994594,
+            40.735944
+          ],
+          [
+            -73.992686,
+            40.734117
+          ],
+          [
+            -73.9911,
+            40.7359
+          ]
+        ]
+      }
+    },
+    {
+      "name": "a destination, planned, 40 min, streets at 1.2",
+      "streetCalls": 2,
+      "result": {
+        "record": {
+          "id": "plan-07",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "destination",
+            "at": {
+              "lat": 40.7484,
+              "lon": -73.9857
+            },
+            "name": "Empire State Building"
+          },
+          "mode": "walk",
+          "minutes": 40,
+          "order": "planned",
+          "stops": [
+            {
+              "n": 1,
+              "card": "Ginkgo",
+              "place": {
+                "id": "tree:105",
+                "lat": 40.735884,
+                "lon": -73.989108
+              },
+              "leg": {
+                "m": 262,
+                "min": 3.3
+              },
+              "arriveMin": 3.3,
+              "status": "planned"
+            },
+            {
+              "n": 2,
+              "card": "Silver linden",
+              "place": {
+                "id": "tree:120",
+                "lat": 40.736407,
+                "lon": -73.987625
+              },
+              "leg": {
+                "m": 215,
+                "min": 2.7
+              },
+              "arriveMin": 7,
+              "status": "planned"
+            },
+            {
+              "n": 3,
+              "card": "Red maple",
+              "place": {
+                "id": "tree:113",
+                "lat": 40.739403,
+                "lon": -73.989016
+              },
+              "leg": {
+                "m": 548,
+                "min": 6.9
+              },
+              "arriveMin": 14.8,
+              "status": "planned"
+            },
+            {
+              "n": 4,
+              "card": "Amur maackia",
+              "place": {
+                "id": "tree:132",
+                "lat": 40.740315,
+                "lon": -73.989011
+              },
+              "leg": {
+                "m": 157,
+                "min": 2
+              },
+              "arriveMin": 17.8,
+              "status": "planned"
+            },
+            {
+              "n": 5,
+              "card": "Cherry",
+              "place": {
+                "id": "tree:117",
+                "lat": 40.742528,
+                "lon": -73.988121
+              },
+              "leg": {
+                "m": 399,
+                "min": 5
+              },
+              "arriveMin": 23.8,
+              "status": "planned"
+            }
+          ],
+          "finish": {
+            "leg": {
+              "m": 1061,
+              "min": 13.3
+            },
+            "arriveMin": 38
+          },
+          "totals": {
+            "stops": 5,
+            "m": 2643,
+            "walkMin": 33,
+            "totalMin": 38,
+            "timing": "mapbox"
+          },
+          "leftOver": 13
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.989108,
+            40.735884
+          ],
+          [
+            -73.987625,
+            40.736407
+          ],
+          [
+            -73.989016,
+            40.739403
+          ],
+          [
+            -73.989011,
+            40.740315
+          ],
+          [
+            -73.988121,
+            40.742528
+          ],
+          [
+            -73.9857,
+            40.7484
+          ]
+        ]
+      }
+    },
+    {
+      "name": "a destination, planned, 25 min, by bike, on the estimate",
+      "streetCalls": 0,
+      "result": {
+        "record": {
+          "id": "plan-08",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "destination",
+            "at": {
+              "lat": 40.7484,
+              "lon": -73.9857
+            },
+            "name": null
+          },
+          "mode": "bike",
+          "minutes": 25,
+          "order": "planned",
+          "stops": [
+            {
+              "n": 1,
+              "card": "Ginkgo",
+              "place": {
+                "id": "tree:105",
+                "lat": 40.735884,
+                "lon": -73.989108
+              },
+              "leg": {
+                "m": 218,
+                "min": 0.9
+              },
+              "arriveMin": 0.9,
+              "status": "planned"
+            },
+            {
+              "n": 2,
+              "card": "Silver linden",
+              "place": {
+                "id": "tree:120",
+                "lat": 40.736407,
+                "lon": -73.987625
+              },
+              "leg": {
+                "m": 179,
+                "min": 0.7
+              },
+              "arriveMin": 2.6,
+              "status": "planned"
+            },
+            {
+              "n": 3,
+              "card": "Japanese zelkova",
+              "place": {
+                "id": "tree:107",
+                "lat": 40.738287,
+                "lon": -73.984227
+              },
+              "leg": {
+                "m": 460,
+                "min": 1.8
+              },
+              "arriveMin": 5.4,
+              "status": "planned"
+            },
+            {
+              "n": 4,
+              "card": "London planetree",
+              "place": {
+                "id": "tree:101",
+                "lat": 40.740849,
+                "lon": -73.983583
+              },
+              "leg": {
+                "m": 375,
+                "min": 1.5
+              },
+              "arriveMin": 7.9,
+              "status": "planned"
+            },
+            {
+              "n": 5,
+              "card": "Red maple",
+              "place": {
+                "id": "tree:113",
+                "lat": 40.739403,
+                "lon": -73.989016
+              },
+              "leg": {
+                "m": 631,
+                "min": 2.5
+              },
+              "arriveMin": 11.5,
+              "status": "planned"
+            },
+            {
+              "n": 6,
+              "card": "Sophora",
+              "place": {
+                "id": "tree:115",
+                "lat": 40.739993,
+                "lon": -73.991174
+              },
+              "leg": {
+                "m": 251,
+                "min": 1
+              },
+              "arriveMin": 13.5,
+              "status": "planned"
+            },
+            {
+              "n": 7,
+              "card": "Callery pear",
+              "place": {
+                "id": "tree:103",
+                "lat": 40.741205,
+                "lon": -73.991879
+              },
+              "leg": {
+                "m": 191,
+                "min": 0.8
+              },
+              "arriveMin": 15.2,
+              "status": "planned"
+            },
+            {
+              "n": 8,
+              "card": "Amur maackia",
+              "place": {
+                "id": "tree:132",
+                "lat": 40.740315,
+                "lon": -73.989011
+              },
+              "leg": {
+                "m": 339,
+                "min": 1.4
+              },
+              "arriveMin": 17.6,
+              "status": "planned"
+            },
+            {
+              "n": 9,
+              "card": "Cherry",
+              "place": {
+                "id": "tree:117",
+                "lat": 40.742528,
+                "lon": -73.988121
+              },
+              "leg": {
+                "m": 333,
+                "min": 1.3
+              },
+              "arriveMin": 19.9,
+              "status": "planned"
+            }
+          ],
+          "finish": {
+            "leg": {
+              "m": 885,
+              "min": 3.5
+            },
+            "arriveMin": 24.4
+          },
+          "totals": {
+            "stops": 9,
+            "m": 3862,
+            "walkMin": 15.4,
+            "totalMin": 24.4,
+            "timing": "estimate"
+          },
+          "leftOver": 9
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.989108,
+            40.735884
+          ],
+          [
+            -73.987625,
+            40.736407
+          ],
+          [
+            -73.984227,
+            40.738287
+          ],
+          [
+            -73.983583,
+            40.740849
+          ],
+          [
+            -73.989016,
+            40.739403
+          ],
+          [
+            -73.991174,
+            40.739993
+          ],
+          [
+            -73.991879,
+            40.741205
+          ],
+          [
+            -73.989011,
+            40.740315
+          ],
+          [
+            -73.988121,
+            40.742528
+          ],
+          [
+            -73.9857,
+            40.7484
+          ]
+        ]
+      }
+    },
+    {
+      "name": "fixed, untimed, a route as walked, streets at 1.3",
+      "streetCalls": 1,
+      "result": {
+        "record": {
+          "id": "plan-09",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "open",
+            "at": null,
+            "name": null
+          },
+          "mode": "walk",
+          "minutes": null,
+          "order": "fixed",
+          "stops": [
+            {
+              "n": 1,
+              "card": "Pin oak",
+              "place": {
+                "id": "tree:100",
+                "lat": 40.734117,
+                "lon": -73.992686
+              },
+              "leg": {
+                "m": 403,
+                "min": 5
+              },
+              "arriveMin": 5,
+              "status": "planned"
+            },
+            {
+              "n": 2,
+              "card": "London planetree",
+              "place": {
+                "id": "tree:101",
+                "lat": 40.740849,
+                "lon": -73.983583
+              },
+              "leg": {
+                "m": 1807,
+                "min": 22.6
+              },
+              "arriveMin": 28.6,
+              "status": "planned"
+            },
+            {
+              "n": 3,
+              "card": "Honeylocust",
+              "place": {
+                "id": "tree:102",
+                "lat": 40.734777,
+                "lon": -73.994628
+              },
+              "leg": {
+                "m": 1941,
+                "min": 24.3
+              },
+              "arriveMin": 53.9,
+              "status": "planned"
+            },
+            {
+              "n": 4,
+              "card": "Callery pear",
+              "place": {
+                "id": "tree:103",
+                "lat": 40.741205,
+                "lon": -73.991879
+              },
+              "leg": {
+                "m": 1263,
+                "min": 15.8
+              },
+              "arriveMin": 70.7,
+              "status": "planned"
+            },
+            {
+              "n": 5,
+              "card": "Ginkgo",
+              "place": {
+                "id": "tree:105",
+                "lat": 40.735884,
+                "lon": -73.989108
+              },
+              "leg": {
+                "m": 1070,
+                "min": 13.4
+              },
+              "arriveMin": 85,
+              "status": "planned"
+            },
+            {
+              "n": 6,
+              "card": "Japanese zelkova",
+              "place": {
+                "id": "tree:107",
+                "lat": 40.738287,
+                "lon": -73.984227
+              },
+              "leg": {
+                "m": 828,
+                "min": 10.4
+              },
+              "arriveMin": 96.4,
+              "status": "planned"
+            },
+            {
+              "n": 7,
+              "card": "Littleleaf linden",
+              "place": {
+                "id": "tree:110",
+                "lat": 40.733229,
+                "lon": -73.98348
+              },
+              "leg": {
+                "m": 951,
+                "min": 11.9
+              },
+              "arriveMin": 109.3,
+              "status": "planned"
+            },
+            {
+              "n": 8,
+              "card": "Red maple",
+              "place": {
+                "id": "tree:111",
+                "lat": 40.741597,
+                "lon": -73.982827
+              },
+              "leg": {
+                "m": 1566,
+                "min": 19.6
+              },
+              "arriveMin": 129.8,
+              "status": "planned"
+            },
+            {
+              "n": 9,
+              "card": "Norway maple",
+              "place": {
+                "id": "tree:114",
+                "lat": 40.733347,
+                "lon": -73.992485
+              },
+              "leg": {
+                "m": 2067,
+                "min": 25.8
+              },
+              "arriveMin": 156.7,
+              "status": "planned"
+            }
+          ],
+          "finish": null,
+          "totals": {
+            "stops": 9,
+            "m": 11894,
+            "walkMin": 148.7,
+            "totalMin": 157.7,
+            "timing": "mapbox"
+          },
+          "leftOver": 0
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.992686,
+            40.734117
+          ],
+          [
+            -73.983583,
+            40.740849
+          ],
+          [
+            -73.994628,
+            40.734777
+          ],
+          [
+            -73.991879,
+            40.741205
+          ],
+          [
+            -73.989108,
+            40.735884
+          ],
+          [
+            -73.984227,
+            40.738287
+          ],
+          [
+            -73.98348,
+            40.733229
+          ],
+          [
+            -73.982827,
+            40.741597
+          ],
+          [
+            -73.992485,
+            40.733347
+          ]
+        ]
+      }
+    },
+    {
+      "name": "placed, 15 min, on the estimate",
+      "streetCalls": 0,
+      "result": {
+        "record": {
+          "id": "plan-10",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "open",
+            "at": null,
+            "name": null
+          },
+          "mode": "walk",
+          "minutes": 15,
+          "order": "placed",
+          "stops": [
+            {
+              "n": 1,
+              "card": "Pin oak",
+              "place": {
+                "id": "tree:100",
+                "lat": 40.734117,
+                "lon": -73.992686
+              },
+              "leg": {
+                "m": 310,
+                "min": 3.9
+              },
+              "arriveMin": 3.9,
+              "status": "planned"
+            }
+          ],
+          "finish": null,
+          "totals": {
+            "stops": 1,
+            "m": 310,
+            "walkMin": 3.9,
+            "totalMin": 4.9,
+            "timing": "estimate"
+          },
+          "leftOver": 8
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.992686,
+            40.734117
+          ]
+        ]
+      }
+    },
+    {
+      "name": "fixed, back to the start, 25 min, streets at 2",
+      "streetCalls": 1,
+      "result": {
+        "record": {
+          "id": "plan-11",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "start",
+            "at": {
+              "lat": 40.7359,
+              "lon": -73.9911
+            },
+            "name": null
+          },
+          "mode": "walk",
+          "minutes": 25,
+          "order": "fixed",
+          "stops": [
+            {
+              "n": 1,
+              "card": "Pin oak",
+              "place": {
+                "id": "tree:100",
+                "lat": 40.734117,
+                "lon": -73.992686
+              },
+              "leg": {
+                "m": 619,
+                "min": 7.7
+              },
+              "arriveMin": 7.7,
+              "status": "planned"
+            }
+          ],
+          "finish": {
+            "leg": {
+              "m": 619,
+              "min": 7.7
+            },
+            "arriveMin": 16.5
+          },
+          "totals": {
+            "stops": 1,
+            "m": 1239,
+            "walkMin": 15.5,
+            "totalMin": 16.5,
+            "timing": "mapbox"
+          },
+          "leftOver": 8
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.992686,
+            40.734117
+          ],
+          [
+            -73.9911,
+            40.7359
+          ]
+        ]
+      }
+    },
+    {
+      "name": "nothing in reach: no candidates, 12 wanted",
+      "streetCalls": 0,
+      "result": {
+        "record": {
+          "id": "plan-12",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "destination",
+            "at": {
+              "lat": 40.7061,
+              "lon": -74.0087
+            },
+            "name": "Wall Street"
+          },
+          "mode": "walk",
+          "minutes": 20,
+          "order": "planned",
+          "stops": [],
+          "finish": {
+            "leg": {
+              "m": 4697,
+              "min": 58.7
+            },
+            "arriveMin": 58.7
+          },
+          "totals": {
+            "stops": 0,
+            "m": 4697,
+            "walkMin": 58.7,
+            "totalMin": 58.7,
+            "timing": "estimate"
+          },
+          "leftOver": 12
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -74.0087,
+            40.7061
+          ]
+        ]
+      }
+    },
+    {
+      "name": "more wanted than have a tree in reach",
+      "streetCalls": 0,
+      "result": {
+        "record": {
+          "id": "plan-13",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "open",
+            "at": null,
+            "name": null
+          },
+          "mode": "walk",
+          "minutes": 30,
+          "order": "planned",
+          "stops": [
+            {
+              "n": 1,
+              "card": "Ginkgo",
+              "place": {
+                "id": "tree:105",
+                "lat": 40.735884,
+                "lon": -73.989108
+              },
+              "leg": {
+                "m": 218,
+                "min": 2.7
+              },
+              "arriveMin": 2.7,
+              "status": "planned"
+            },
+            {
+              "n": 2,
+              "card": "Silver linden",
+              "place": {
+                "id": "tree:120",
+                "lat": 40.736407,
+                "lon": -73.987625
+              },
+              "leg": {
+                "m": 179,
+                "min": 2.2
+              },
+              "arriveMin": 6,
+              "status": "planned"
+            },
+            {
+              "n": 3,
+              "card": "Red maple",
+              "place": {
+                "id": "tree:113",
+                "lat": 40.739403,
+                "lon": -73.989016
+              },
+              "leg": {
+                "m": 457,
+                "min": 5.7
+              },
+              "arriveMin": 12.7,
+              "status": "planned"
+            },
+            {
+              "n": 4,
+              "card": "Amur maackia",
+              "place": {
+                "id": "tree:132",
+                "lat": 40.740315,
+                "lon": -73.989011
+              },
+              "leg": {
+                "m": 131,
+                "min": 1.6
+              },
+              "arriveMin": 15.3,
+              "status": "planned"
+            },
+            {
+              "n": 5,
+              "card": "Sophora",
+              "place": {
+                "id": "tree:115",
+                "lat": 40.739993,
+                "lon": -73.991174
+              },
+              "leg": {
+                "m": 242,
+                "min": 3
+              },
+              "arriveMin": 19.3,
+              "status": "planned"
+            },
+            {
+              "n": 6,
+              "card": "Callery pear",
+              "place": {
+                "id": "tree:103",
+                "lat": 40.741205,
+                "lon": -73.991879
+              },
+              "leg": {
+                "m": 191,
+                "min": 2.4
+              },
+              "arriveMin": 22.7,
+              "status": "planned"
+            }
+          ],
+          "finish": null,
+          "totals": {
+            "stops": 6,
+            "m": 1418,
+            "walkMin": 17.7,
+            "totalMin": 23.7,
+            "timing": "estimate"
+          },
+          "leftOver": 19
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.989108,
+            40.735884
+          ],
+          [
+            -73.987625,
+            40.736407
+          ],
+          [
+            -73.989016,
+            40.739403
+          ],
+          [
+            -73.989011,
+            40.740315
+          ],
+          [
+            -73.991174,
+            40.739993
+          ],
+          [
+            -73.991879,
+            40.741205
+          ]
+        ]
+      }
+    },
+    {
+      "name": "the street service fails: the estimate stands",
+      "streetCalls": 1,
+      "result": {
+        "record": {
+          "id": "plan-14",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "open",
+            "at": null,
+            "name": null
+          },
+          "mode": "walk",
+          "minutes": 30,
+          "order": "planned",
+          "stops": [
+            {
+              "n": 1,
+              "card": "Ginkgo",
+              "place": {
+                "id": "tree:105",
+                "lat": 40.735884,
+                "lon": -73.989108
+              },
+              "leg": {
+                "m": 218,
+                "min": 2.7
+              },
+              "arriveMin": 2.7,
+              "status": "planned"
+            },
+            {
+              "n": 2,
+              "card": "Silver linden",
+              "place": {
+                "id": "tree:120",
+                "lat": 40.736407,
+                "lon": -73.987625
+              },
+              "leg": {
+                "m": 179,
+                "min": 2.2
+              },
+              "arriveMin": 6,
+              "status": "planned"
+            },
+            {
+              "n": 3,
+              "card": "Red maple",
+              "place": {
+                "id": "tree:113",
+                "lat": 40.739403,
+                "lon": -73.989016
+              },
+              "leg": {
+                "m": 457,
+                "min": 5.7
+              },
+              "arriveMin": 12.7,
+              "status": "planned"
+            },
+            {
+              "n": 4,
+              "card": "Amur maackia",
+              "place": {
+                "id": "tree:132",
+                "lat": 40.740315,
+                "lon": -73.989011
+              },
+              "leg": {
+                "m": 131,
+                "min": 1.6
+              },
+              "arriveMin": 15.3,
+              "status": "planned"
+            },
+            {
+              "n": 5,
+              "card": "Sophora",
+              "place": {
+                "id": "tree:115",
+                "lat": 40.739993,
+                "lon": -73.991174
+              },
+              "leg": {
+                "m": 242,
+                "min": 3
+              },
+              "arriveMin": 19.3,
+              "status": "planned"
+            },
+            {
+              "n": 6,
+              "card": "Callery pear",
+              "place": {
+                "id": "tree:103",
+                "lat": 40.741205,
+                "lon": -73.991879
+              },
+              "leg": {
+                "m": 191,
+                "min": 2.4
+              },
+              "arriveMin": 22.7,
+              "status": "planned"
+            }
+          ],
+          "finish": null,
+          "totals": {
+            "stops": 6,
+            "m": 1418,
+            "walkMin": 17.7,
+            "totalMin": 23.7,
+            "timing": "estimate"
+          },
+          "leftOver": 12
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.989108,
+            40.735884
+          ],
+          [
+            -73.987625,
+            40.736407
+          ],
+          [
+            -73.989016,
+            40.739403
+          ],
+          [
+            -73.989011,
+            40.740315
+          ],
+          [
+            -73.991174,
+            40.739993
+          ],
+          [
+            -73.991879,
+            40.741205
+          ]
+        ]
+      }
+    },
+    {
+      "name": "the street service fails on the second call",
+      "streetCalls": 2,
+      "result": {
+        "record": {
+          "id": "plan-15",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "start",
+            "at": {
+              "lat": 40.7359,
+              "lon": -73.9911
+            },
+            "name": null
+          },
+          "mode": "walk",
+          "minutes": 30,
+          "order": "planned",
+          "stops": [
+            {
+              "n": 1,
+              "card": "Swamp white oak",
+              "place": {
+                "id": "tree:127",
+                "lat": 40.733648,
+                "lon": -73.994821
+              },
+              "leg": {
+                "m": 521,
+                "min": 6.5
+              },
+              "arriveMin": 6.5,
+              "status": "planned"
+            },
+            {
+              "n": 2,
+              "card": "Hedge maple",
+              "place": {
+                "id": "tree:124",
+                "lat": 40.733929,
+                "lon": -73.994337
+              },
+              "leg": {
+                "m": 67,
+                "min": 0.8
+              },
+              "arriveMin": 8.3,
+              "status": "planned"
+            },
+            {
+              "n": 3,
+              "card": "Pin oak",
+              "place": {
+                "id": "tree:100",
+                "lat": 40.734117,
+                "lon": -73.992686
+              },
+              "leg": {
+                "m": 183,
+                "min": 2.3
+              },
+              "arriveMin": 11.6,
+              "status": "planned"
+            }
+          ],
+          "finish": {
+            "leg": {
+              "m": 310,
+              "min": 3.9
+            },
+            "arriveMin": 16.5
+          },
+          "totals": {
+            "stops": 3,
+            "m": 1080,
+            "walkMin": 13.5,
+            "totalMin": 16.5,
+            "timing": "estimate"
+          },
+          "leftOver": 15
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.994821,
+            40.733648
+          ],
+          [
+            -73.994337,
+            40.733929
+          ],
+          [
+            -73.992686,
+            40.734117
+          ],
+          [
+            -73.9911,
+            40.7359
+          ]
+        ]
+      }
+    },
+    {
+      "name": "five rounds and still over, back to the start: the estimate",
+      "streetCalls": 5,
+      "result": {
+        "record": {
+          "id": "plan-16",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "start",
+            "at": {
+              "lat": 40.7359,
+              "lon": -73.9911
+            },
+            "name": null
+          },
+          "mode": "walk",
+          "minutes": 45,
+          "order": "planned",
+          "stops": [
+            {
+              "n": 1,
+              "card": "American elm",
+              "place": {
+                "id": "tree:118",
+                "lat": 40.734449,
+                "lon": -73.995477
+              },
+              "leg": {
+                "m": 1306,
+                "min": 16.3
+              },
+              "arriveMin": 16.3,
+              "status": "planned"
+            },
+            {
+              "n": 2,
+              "card": "Honeylocust",
+              "place": {
+                "id": "tree:102",
+                "lat": 40.734777,
+                "lon": -73.994628
+              },
+              "leg": {
+                "m": 104,
+                "min": 1.3
+              },
+              "arriveMin": 18.6,
+              "status": "planned"
+            },
+            {
+              "n": 3,
+              "card": "Sweetgum",
+              "place": {
+                "id": "tree:128",
+                "lat": 40.735944,
+                "lon": -73.994594
+              },
+              "leg": {
+                "m": 168,
+                "min": 2.1
+              },
+              "arriveMin": 21.7,
+              "status": "planned"
+            },
+            {
+              "n": 4,
+              "card": "Pin oak",
+              "place": {
+                "id": "tree:100",
+                "lat": 40.734117,
+                "lon": -73.992686
+              },
+              "leg": {
+                "m": 336,
+                "min": 4.2
+              },
+              "arriveMin": 26.9,
+              "status": "planned"
+            }
+          ],
+          "finish": {
+            "leg": {
+              "m": 310,
+              "min": 3.9
+            },
+            "arriveMin": 31.8
+          },
+          "totals": {
+            "stops": 4,
+            "m": 2224,
+            "walkMin": 27.8,
+            "totalMin": 31.8,
+            "timing": "estimate"
+          },
+          "leftOver": 14
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.995477,
+            40.734449
+          ],
+          [
+            -73.994628,
+            40.734777
+          ],
+          [
+            -73.994594,
+            40.735944
+          ],
+          [
+            -73.992686,
+            40.734117
+          ],
+          [
+            -73.9911,
+            40.7359
+          ]
+        ]
+      }
+    },
+    {
+      "name": "five rounds and still over, open: the timed stops win",
+      "streetCalls": 6,
+      "result": {
+        "record": {
+          "id": "plan-17",
+          "app": "treehopper",
+          "set": "nyc-street-trees",
+          "madeBy": "player:test",
+          "madeAt": "2026-10-28T12:00:00.000Z",
+          "planVersion": 1,
+          "start": {
+            "lat": 40.7359,
+            "lon": -73.9911
+          },
+          "end": {
+            "kind": "open",
+            "at": null,
+            "name": null
+          },
+          "mode": "walk",
+          "minutes": 45,
+          "order": "planned",
+          "stops": [
+            {
+              "n": 1,
+              "card": "Ginkgo",
+              "place": {
+                "id": "tree:105",
+                "lat": 40.735884,
+                "lon": -73.989108
+              },
+              "leg": {
+                "m": 1311,
+                "min": 16.4
+              },
+              "arriveMin": 16.4,
+              "status": "planned"
+            },
+            {
+              "n": 2,
+              "card": "Silver linden",
+              "place": {
+                "id": "tree:120",
+                "lat": 40.736407,
+                "lon": -73.987625
+              },
+              "leg": {
+                "m": 179,
+                "min": 2.2
+              },
+              "arriveMin": 19.6,
+              "status": "planned"
+            },
+            {
+              "n": 3,
+              "card": "Red maple",
+              "place": {
+                "id": "tree:113",
+                "lat": 40.739403,
+                "lon": -73.989016
+              },
+              "leg": {
+                "m": 457,
+                "min": 5.7
+              },
+              "arriveMin": 26.3,
+              "status": "planned"
+            },
+            {
+              "n": 4,
+              "card": "Amur maackia",
+              "place": {
+                "id": "tree:132",
+                "lat": 40.740315,
+                "lon": -73.989011
+              },
+              "leg": {
+                "m": 131,
+                "min": 1.6
+              },
+              "arriveMin": 29,
+              "status": "planned"
+            },
+            {
+              "n": 5,
+              "card": "Sophora",
+              "place": {
+                "id": "tree:115",
+                "lat": 40.739993,
+                "lon": -73.991174
+              },
+              "leg": {
+                "m": 242,
+                "min": 3
+              },
+              "arriveMin": 33,
+              "status": "planned"
+            },
+            {
+              "n": 6,
+              "card": "Callery pear",
+              "place": {
+                "id": "tree:103",
+                "lat": 40.741205,
+                "lon": -73.991879
+              },
+              "leg": {
+                "m": 191,
+                "min": 2.4
+              },
+              "arriveMin": 36.4,
+              "status": "planned"
+            },
+            {
+              "n": 7,
+              "card": "Cherry",
+              "place": {
+                "id": "tree:117",
+                "lat": 40.742528,
+                "lon": -73.988121
+              },
+              "leg": {
+                "m": 454,
+                "min": 5.7
+              },
+              "arriveMin": 43,
+              "status": "planned"
+            }
+          ],
+          "finish": null,
+          "totals": {
+            "stops": 7,
+            "m": 2964,
+            "walkMin": 37,
+            "totalMin": 44,
+            "timing": "mapbox"
+          },
+          "leftOver": 11
+        },
+        "geometry": [
+          [
+            -73.9911,
+            40.7359
+          ],
+          [
+            -73.989108,
+            40.735884
+          ],
+          [
+            -73.987625,
+            40.736407
+          ],
+          [
+            -73.989016,
+            40.739403
+          ],
+          [
+            -73.989011,
+            40.740315
+          ],
+          [
+            -73.991174,
+            40.739993
+          ],
+          [
+            -73.991879,
+            40.741205
+          ],
+          [
+            -73.988121,
+            40.742528
+          ]
+        ]
+      }
+    },
+    {
+      "name": "a destination with no point",
+      "streetCalls": 0,
+      "result": {
+        "error": "a destination needs a point"
+      }
+    }
+  ]
+}

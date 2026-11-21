@@ -1,0 +1,5 @@
+node_modules/
+dist/
+*.tgz
+# sources the tests read from git at a pinned commit (planner/test/pinned.ts)
+.pinned/

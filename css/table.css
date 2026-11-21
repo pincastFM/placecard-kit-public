@@ -1,0 +1,426 @@
+/* Card room table: the mechanics tokens and every rule. A port of the design lab's Card room page.
+   Rules read tokens only. The theme (css/themes/cardroom.css, or an app's) sets the 25 theme tokens on .tt; a token
+   with a default is read here as var(--x, default), and the theme file lists them all. The one raw color left is the
+   masks' #000, which is alpha, not a color.
+   Every token and rule sits under .tt and every class is tt- prefixed, so nothing leaks into the app
+   or out of it; resets use :where(.tt) to keep the lab's specificity (the app's Tailwind base styles
+   every button). The faces (TtFace.vue, .ttf) are the apps' and never read these tokens. */
+.tt{
+  --e-out:cubic-bezier(.2,.8,.2,1); --e-in:cubic-bezier(.4,0,1,1); --e-end:cubic-bezier(0,0,.2,1); --e-settle:cubic-bezier(.4,0,.2,1);
+  --d-fast:120ms; --d-med:160ms;
+  --card-w:111px; --gap:6px;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+  --padl:max(16px, env(safe-area-inset-left,0px)); --padr:max(16px, env(safe-area-inset-right,0px));
+  --top-h:48px; --strip-h:48px; --dock-h:111px;
+
+  position:relative;min-height:100vh;min-height:100dvh;
+  background:var(--ground) var(--spot) no-repeat;color:var(--chrome);
+  font:15px/1.4 var(--font-text);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;
+  text-align:left;
+}
+
+/* ── The page under the table ─────────────────────────────────────────────── */
+html[data-tt]{scrollbar-gutter:stable;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html[data-tt] body{margin:0}
+html[data-tt-locked]{overflow:hidden}
+
+/* ── Reset (zero specificity past the lab's own) ───────────────────────────── */
+:where(.tt), :where(.tt) *, :where(.tt) *::before, :where(.tt) *::after{box-sizing:border-box}
+.tt::before{content:"";position:fixed;inset:0;background:var(--grain);opacity:var(--grain-a);mix-blend-mode:soft-light;pointer-events:none}
+:where(.tt) button, :where(.tt) input{font:inherit;color:inherit;margin:0}
+:where(.tt) button{background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:inherit}
+:where(.tt) a{color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent}
+.tt [hidden]{display:none !important}
+:where(.tt) :focus{outline:none}
+:where(.tt) :focus-visible{outline:2px solid var(--chrome);outline-offset:2px}
+.tt svg.tt-i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.tt svg.tt-i16{width:16px;height:16px}
+.tt-vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* The ticket stub: notched ends, no perforation */
+.tt-stub{--nr:5px;
+  -webkit-mask:radial-gradient(circle at 0 50%, transparent var(--nr), #000 calc(var(--nr) + .5px)) left/51% 100% no-repeat, radial-gradient(circle at 100% 50%, transparent var(--nr), #000 calc(var(--nr) + .5px)) right/51% 100% no-repeat;
+          mask:radial-gradient(circle at 0 50%, transparent var(--nr), #000 calc(var(--nr) + .5px)) left/51% 100% no-repeat, radial-gradient(circle at 100% 50%, transparent var(--nr), #000 calc(var(--nr) + .5px)) right/51% 100% no-repeat}
+
+/* ── Top bar ───────────────────────────────────────────────────────────────── */
+.tt-top{position:sticky;top:var(--sat);z-index:31;background:var(--ground)}
+.tt-top::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:var(--sat);background:var(--ground)}
+.tt-top-in{height:var(--top-h);display:flex;align-items:center;gap:8px;padding-left:var(--padl);padding-right:var(--padr)}
+.tt-back{display:inline-flex;align-items:center;gap:1px;height:44px;margin-left:-8px;padding:0 6px 0 2px;border-radius:var(--r-1);
+  font:700 16px/1 var(--font-display);letter-spacing:.06em;text-transform:uppercase;color:var(--chrome-2);flex:none}
+.tt-back:hover{color:var(--chrome)}
+.tt-tag{display:inline-flex;align-items:center;height:22px;padding:0 9px;--nr:4px;background:var(--surface);color:var(--chrome-2);
+  font:700 13px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;flex:none}
+.tt-cnt{display:flex;align-items:baseline;gap:5px;white-space:nowrap;min-width:0}
+.tt-cnt > b{font:700 20px/1 var(--font-mono);color:var(--chrome);letter-spacing:-.02em}
+.tt-cl{font:700 15px/1 var(--font-display);letter-spacing:.06em;text-transform:uppercase;color:var(--chrome-2)}
+.tt-cm{display:inline-flex;align-items:center;align-self:center;height:20px;margin-left:4px;padding:0 8px;--nr:4px;background:var(--chrome);color:var(--ground);
+  font:700 11px/1 var(--font-mono);letter-spacing:0;text-transform:uppercase;white-space:nowrap}
+.tt-cm b{font:inherit;color:inherit;letter-spacing:inherit}
+.tt-top-in.is-tight .tt-cl{display:none}
+.tt-top-sl{display:none}
+.tt-stk{margin-left:auto;display:inline-flex;align-items:center;gap:5px;height:44px;padding:0 8px;margin-right:-8px;border-radius:var(--r-1);
+  font:700 16px/1 var(--font-display);letter-spacing:.06em;text-transform:uppercase;color:var(--chrome);flex:none}
+.tt-stk[aria-pressed="true"] svg{color:var(--gold)}
+.tt-stk:disabled{opacity:.35;cursor:default}
+
+/* ── Ledger: the box-score strip, one column per group of the first grouping ───── */
+.tt-strip{position:sticky;top:calc(var(--sat) + var(--top-h));z-index:30;background:var(--ground-2);border-bottom:1px solid var(--line);
+  padding-left:var(--padl);padding-right:var(--padr)}
+.tt-ledger{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(max(25%, 84px),1fr);height:var(--strip-h);
+  overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none}
+.tt-ledger::-webkit-scrollbar{display:none}
+.tt-lg{position:relative;display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0;padding:0 8px 0 9px;color:var(--chrome-2)}
+.tt-lg + .tt-lg{border-left:1px solid var(--line)}
+.tt-lg:first-child{padding-left:0}
+.tt-lg-top{display:flex;flex-direction:column;gap:2px;min-width:0}
+.tt-lg-name{display:flex;align-items:center;gap:5px;font:700 var(--lg-name, 13px)/1 var(--font-display);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.tt-lg-name i{width:6px;height:6px;flex:none;background:var(--app)}
+.tt-lg-fig{font:500 12px/1 var(--font-mono);color:var(--chrome-3);white-space:nowrap}
+.tt-lg-fig b{font-weight:700;color:var(--chrome-2)}
+.tt-lg .tt-bar{margin-top:3px}
+.tt-lg[aria-current="true"]{color:var(--chrome)}
+.tt-lg[aria-current="true"] .tt-lg-fig b{color:var(--chrome)}
+.tt-lg[aria-current="true"]::after{content:"";position:absolute;left:0;right:8px;top:0;height:2px;background:var(--app)}
+.tt-lg + .tt-lg[aria-current="true"]::after{left:9px}
+.tt-lg:disabled{opacity:.45;cursor:default}
+
+/* Segmented held bar: one segment per stop for walks, twelve scaled for big sets */
+.tt-bar{display:block;height:3px;width:100%;
+  -webkit-mask:repeating-linear-gradient(90deg,#000 0 calc(100% / var(--n) - 2px),transparent 0 calc(100% / var(--n)));
+          mask:repeating-linear-gradient(90deg,#000 0 calc(100% / var(--n) - 2px),transparent 0 calc(100% / var(--n)))}
+
+/* ── Dock (phone): chip rail and ruler at thumb reach ───────────────────────── */
+.tt-dock{position:fixed;left:0;right:0;bottom:0;z-index:32;background:var(--ground-2);border-top:1px solid var(--line);
+  padding-bottom:var(--sab);will-change:transform}
+.tt-rail{display:flex;align-items:center;gap:6px;height:56px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;
+  scrollbar-width:none;padding-left:var(--padl);padding-right:var(--padr);scroll-padding-inline:16px;
+  -webkit-mask:linear-gradient(90deg,transparent 0,#000 12px);mask:linear-gradient(90deg,transparent 0,#000 12px)}
+.tt-rail::-webkit-scrollbar{display:none}
+/* The phone dock's chips wrap to rows instead of scrolling, when the host asks (TtTable dock-wrap) */
+.tt.is-dock-wrap .tt-dock .tt-rail{flex-wrap:wrap;height:auto;min-height:56px;padding-top:6px;padding-bottom:6px;overflow-x:visible;-webkit-mask:none;mask:none}
+.tt-seg{display:inline-flex;flex:none;height:44px;padding:3px;gap:3px;border:1px solid var(--line-2);border-radius:var(--r-1)}
+.tt-seg button{position:relative;min-width:44px;padding:0 var(--seg-px, 9px);border-radius:2px;font:700 14px/1 var(--font-display);letter-spacing:.07em;text-transform:uppercase;color:var(--chrome-2)}
+.tt-seg button::before{content:"";position:absolute;inset:-4px -2px}
+.tt-seg button[aria-checked="true"]{background:var(--chrome);color:var(--ground)}
+.tt-chip{position:relative;flex:none;display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 var(--chip-px, 13px);border:1px solid var(--line-2);border-radius:var(--r-1);
+  font:500 14px/1 var(--font-text);color:var(--chrome);white-space:nowrap;transition:background-color var(--d-med) var(--e-out),color var(--d-med) var(--e-out)}
+.tt-chip .tt-v{font:600 12px/1 var(--font-mono);color:var(--chrome-2)}
+.tt-chip.is-on{background:var(--chrome);border-color:var(--chrome);color:var(--ground)}
+.tt-chip.is-on .tt-v{color:var(--ground);opacity:.72}
+.tt-chip[aria-expanded="true"]{border-color:var(--chrome)}
+.tt-chip svg.tt-i16{margin-left:-2px}
+.tt-search{position:sticky;right:var(--padr);z-index:2;flex:none;display:inline-flex;align-items:center;height:44px;width:46px;border:1px solid var(--line-2);border-radius:var(--r-1);
+  overflow:hidden;background:var(--ground-2);box-shadow:-6px 0 0 0 var(--ground-2), -7px 0 0 0 var(--search-edge, #2A3344), 30px 0 0 8px var(--ground-2);transition:width var(--d-med) var(--e-out)}
+.tt-s-btn{position:relative;flex:none;width:44px;height:42px;display:grid;place-items:center;color:var(--chrome)}
+.tt-search input{flex:1;min-width:0;height:42px;border:0;background:none;padding:0 2px 0 0;font:500 16px/1 var(--font-text);color:var(--chrome);-webkit-appearance:none;appearance:none}
+.tt-search input::placeholder{color:var(--chrome-3)}
+.tt-search input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+.tt-s-x{flex:none;width:40px;height:42px;display:grid;place-items:center;color:var(--chrome-2)}
+.tt-search:not(.is-open) input,.tt-search:not(.is-open) .tt-s-x{visibility:hidden}
+.tt-search.is-open{width:212px;border-color:var(--chrome-2)}
+.tt-search.is-has .tt-s-btn{color:var(--gold)}
+
+/* The ruler: track, minor ticks, stops labeled with cards across */
+.tt-slrow{display:flex;align-items:center;gap:12px;height:54px;padding-left:var(--padl);padding-right:var(--padr)}
+.tt-ruler{position:relative;flex:1;height:48px;min-width:0}
+.tt-ruler::before{content:"";position:absolute;left:7px;right:7px;top:19px;height:2px;
+  background:linear-gradient(90deg,var(--chrome-2) var(--p,30%),var(--line-2) var(--p,30%))}
+.tt-ruler::after{content:"";position:absolute;left:7px;right:7px;top:13px;height:4px;opacity:.9;
+  background:repeating-linear-gradient(90deg,var(--line-2) 0 1px,transparent 1px 9px)}
+.tt-ruler input{position:absolute;inset:0;width:100%;height:48px;margin:0;background:none;-webkit-appearance:none;appearance:none;cursor:pointer;z-index:2;touch-action:pan-y}
+.tt-ruler input::-webkit-slider-runnable-track{height:48px;background:none;border:0}
+.tt-ruler input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:26px;margin-top:7px;border:0;border-radius:3px;background:var(--chrome);
+  box-shadow:var(--thumb-shadow, 0 1px 0 rgba(0,0,0,.6), 0 4px 10px rgba(0,0,0,.45));
+  -webkit-mask:radial-gradient(circle at 50% 0,transparent 3px,#000 3.5px) top/100% 51% no-repeat,radial-gradient(circle at 50% 100%,transparent 3px,#000 3.5px) bottom/100% 51% no-repeat}
+.tt-ruler input::-moz-range-track{height:48px;background:none;border:0}
+.tt-ruler input::-moz-range-thumb{width:14px;height:26px;border:0;border-radius:3px;background:var(--chrome)}
+.tt-ruler input:focus-visible{outline:none}
+.tt-ruler input:focus-visible::-webkit-slider-thumb{outline:2px solid var(--chrome);outline-offset:3px}
+.tt-tk{position:absolute;top:0;left:0;height:48px;width:0;pointer-events:none}
+.tt-tk::before{content:"";position:absolute;left:-.5px;top:16px;width:1px;height:8px;background:var(--chrome-2)}
+.tt-tk span{position:absolute;top:36px;left:0;transform:translateX(-50%);font:500 10px/1 var(--font-mono);color:var(--chrome-3);transition:color var(--d-med) var(--e-out)}
+.tt-tk.is-on::before{background:var(--chrome)}
+.tt-tk.is-on span{color:var(--chrome);font-weight:700}
+.tt-acr{flex:none;min-width:34px;text-align:right;font:700 13px/1 var(--font-mono);color:var(--chrome)}
+
+/* ── Table ───────────────────────────────────────────────────────────────── */
+.tt-main{position:relative;overflow-x:clip;padding:20px var(--padr) calc(var(--dock-h) + var(--sab) + 32px) var(--padl)}
+.tt-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%, max(calc(var(--card-w) + 14px), 112px)),1fr));
+  column-gap:8px;row-gap:30px;align-items:start;transform-origin:50% 0}
+.tt-grp{min-width:0;scroll-margin-top:calc(var(--sat) + var(--top-h) + var(--strip-h) + 12px)}
+.tt-grp:not(.is-stacked){grid-column:1/-1}
+
+/* Box-score header */
+.tt-bx{position:relative;display:block;width:100%;padding:0 0 0 13px;color:var(--chrome)}
+.tt-bx::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--app)}
+.tt-bx-row{display:flex;align-items:center;gap:10px;height:40px;min-width:0}
+.tt-bx-name{font:800 24px/1 var(--font-display);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;flex:none;padding-top:1px}
+.tt-bx-name.is-gold{color:var(--gold)}
+.tt-bx-sub{flex:1;min-width:0;font:500 13px/1.2 var(--font-text);color:var(--chrome-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tt-bx-end{margin-left:auto;display:flex;align-items:center;gap:10px;flex:none}
+.tt-bx-shown{font:600 11px/1 var(--font-mono);color:var(--chrome-2);letter-spacing:.02em}
+.tt-bx-fig{font:700 14px/1 var(--font-mono);color:var(--chrome);white-space:nowrap}
+.tt-bx-fig i{font-style:normal;color:var(--chrome-3)}
+.tt-bx-fig em{font:700 12px/1 var(--font-display);font-style:normal;letter-spacing:.08em;color:var(--chrome-2);margin-left:4px}
+.tt-bx svg{color:var(--chrome-3)}
+.tt-groups.is-q .tt-bx svg{display:none}
+.tt-bx .tt-bar{margin-top:2px}
+/* 1.2.0: a group's own actions after its head (TtTable slot group-act; the design board's Route); empty, none */
+.tt-bx-act{display:flex;gap:6px;margin:10px 0 0 13px}
+.tt-bx-act:empty{display:none}
+.tt-grp.is-stacked .tt-bx{padding-left:10px}
+.tt-grp.is-stacked .tt-bx-row{flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;height:auto;padding:3px 0 4px}
+.tt-grp.is-stacked .tt-bx-name{font-size:19px;max-width:100%;overflow:hidden;text-overflow:clip}
+.tt-grp.is-stacked .tt-bx-sub,.tt-grp.is-stacked .tt-bx svg,.tt-grp.is-stacked .tt-bx-shown{display:none}
+.tt-grp.is-stacked .tt-bx-end{margin-left:0}
+.tt-grp.is-stacked .tt-bx-fig{font-size:12px}
+
+.tt-grid{display:grid;grid-template-columns:repeat(auto-fill,var(--card-w));column-gap:var(--gap);row-gap:calc(var(--gap) + 8px);justify-content:center;margin-top:14px}
+
+/* A card on the table: the face, a hit target over it, and the table's own overlay (slot cell) */
+.tt-cell{position:relative;display:block;width:var(--card-w);height:calc(var(--card-w) * 15 / 8);padding:0;
+  contain:layout paint style;content-visibility:auto;contain-intrinsic-size:var(--card-w) calc(var(--card-w) * 15 / 8);
+  border-radius:calc(var(--card-w) * .048);box-shadow:var(--shadow-card);transform-origin:50% 60%}
+.tt-cell[data-face="treehopper"]{border-radius:var(--tile-r, min(4px, calc(var(--card-w) * .024)))}
+.tt-cell[data-held="false"]{box-shadow:none}
+/* A card that prints (data-print, core ttPrintOn) is cardstock on the table: radius at most 4 px and the
+   approved design's tile shadow, held or missing alike; a theme may set --pc-tile-rest */
+.tt-cell[data-print]{border-radius:var(--tile-r, min(4px, calc(var(--card-w) * .024)));box-shadow:var(--pc-tile-rest, 0 1px 1px rgba(0,0,0,.6), 0 8px 18px rgba(0,0,0,.45))}
+.tt-hit{position:absolute;inset:0;z-index:5;border-radius:inherit;cursor:pointer}
+.tt-hit:focus-visible{outline-offset:3px}
+@media (hover:hover){
+  .tt-grid .tt-cell{transition:translate var(--d-med) var(--e-out)}
+  .tt-grid .tt-cell:hover{translate:0 -3px}
+}
+/* WANTED: a flat stub on a full color card, bottom left of the art, just above the nameplate */
+.tt-want{position:absolute;z-index:4;left:clamp(3px, 4cqi, 8px);bottom:clamp(3px, 4cqi, 8px);
+  font:700 clamp(7px, 6.6cqi, 10px)/1 var(--font-mono);letter-spacing:.06em;height:1.9em;padding:0 1.05em;
+  display:flex;align-items:center;background:var(--want-bg, #BEC6D3);color:var(--want-ink, #0E1420);--nr:.42em;pointer-events:none}
+.ttf-art.is-typo .tt-want{left:auto;bottom:auto;top:clamp(3px, 4cqi, 8px);right:clamp(3px, 4cqi, 8px)}
+@container ttf (width >= 240px){ .ttf-art .tt-want{left:auto;bottom:auto;top:clamp(4px, 3cqi, 10px);right:clamp(4px, 3cqi, 10px)} }
+
+/* Piles: tilted, seeded; the cover's edges fan from under it */
+.tt-pile{position:relative;display:block;width:var(--card-w);height:calc(var(--card-w) * 15 / 8);margin:14px auto 0;contain:layout style;cursor:pointer;border-radius:calc(var(--card-w) * .048)}
+.tt-pile .tt-cell{position:absolute;inset:0;pointer-events:none;content-visibility:visible}
+.tt-pile .tt-cell[data-k="1"]::after,.tt-pile .tt-cell[data-k="2"]::after,.tt-pile .tt-cell[data-k="3"]::after{content:"";position:absolute;inset:0;z-index:4;border-radius:inherit;pointer-events:none}
+.tt-pile .tt-cell[data-k="1"]::after{background:var(--pile-1, rgba(14,20,32,.2))}
+.tt-pile .tt-cell[data-k="2"]::after{background:var(--pile-2, rgba(14,20,32,.4))}
+.tt-pile .tt-cell[data-k="3"]::after{background:var(--pile-3, rgba(14,20,32,.6))}
+.tt-pile .tt-cell[data-k="1"],.tt-pile .tt-cell[data-k="2"],.tt-pile .tt-cell[data-k="3"]{box-shadow:var(--shadow-pile, 0 1px 1px rgba(0,0,0,.5))}
+.tt-pile-deco{position:absolute;inset:0;pointer-events:none;transform-origin:50% 60%;z-index:5}
+.tt-pile-n{position:absolute;right:clamp(4px, calc(var(--card-w) * .05), 7px);top:clamp(4px, calc(var(--card-w) * .05), 7px);
+  height:clamp(14px, calc(var(--card-w) * .2), 22px);display:flex;align-items:center;padding:var(--pile-n-pad, 0 .95em);--nr:.45em;
+  background:var(--chrome);color:var(--ground);font:700 clamp(8px, calc(var(--card-w) * .1), 11px)/1 var(--font-mono);letter-spacing:.02em}
+.tt-groups:not(.is-solo) .tt-grp.is-stacked .tt-pile{margin-top:12px}
+/* A pile whose cover prints (data-edges, core crPile edges) is a straight stack: the cover flat, the
+   paper edges under it as a set's stack below; the cover takes a 1 px hairline, the tile shadow goes under the lowest edge */
+.tt-pile[data-edges]:not([data-edges="0"]) > .tt-cell{box-shadow:var(--shadow-edge, 0 1px 1px rgba(0,0,0,.4))}
+/* a one-card stack has no edge, so its cover keeps the tile shadow of .tt-cell[data-print] */
+
+/* A card's set, one level under it (UI word "set", code word "nest"; options.nest). In the grid the parent is a
+   stack at tile size: an edge under it for each child up to 6, stepping right and down 2 px, paper core inside a frame
+   line, the table's shadow under the lowest edge only; the card flat on top; the "×N" stub. Tap opens the set */
+.tt-grid > .tt-nest{margin:0}
+.tt-nest[data-face="treehopper"],.tt-pile[data-print]{border-radius:var(--tile-r, min(4px, calc(var(--card-w) * .024)))}
+.tt-edge{position:absolute;inset:0;border-radius:inherit;border:1px solid var(--edge-line, rgba(40,30,20,.5));background:var(--edge-core, #DCD4C2);
+  transform:translate(calc(var(--i) * 2px), calc(var(--i) * 2px));pointer-events:none}
+.tt-edge:first-child{box-shadow:var(--shadow-card)}
+/* printing stacks (a set's or a pile's) are cardstock: the design's tile shadow under the lowest edge, not the theme's
+   card shadow (a hard offset in some themes); a Treehopper stack's edges are cut in its frame color */
+:is(.tt-pile,.tt-nest)[data-print] > .tt-edge:first-child{box-shadow:var(--pc-tile-rest, 0 1px 1px rgba(0,0,0,.6), 0 8px 18px rgba(0,0,0,.45))}
+:is(.tt-pile,.tt-nest)[data-face="treehopper"] > .tt-edge{border-color:var(--edge-line, var(--thf-frame, rgba(40,30,20,.5)))}
+.tt-nest > .tt-cell{box-shadow:var(--shadow-edge, 0 1px 1px rgba(0,0,0,.4))}
+.tt-grid > .tt-nest > .tt-cell{content-visibility:auto}
+.tt-nest:focus-visible{outline-offset:4px}
+@media (hover:hover){
+  .tt-grid > .tt-nest{transition:translate var(--d-med) var(--e-out)}
+  .tt-grid > .tt-nest:hover{translate:0 -3px}
+  .tt-grid > .tt-nest > .tt-cell:hover{translate:none}
+}
+@media (prefers-reduced-motion:reduce){ .tt-grid > .tt-nest{transition:none !important} }
+/* The open set: back, the parent's name on the slip (ellipsis), its count; the dock keeps the ruler alone */
+.tt.is-nest .tt-strip,.tt.is-nest .tt-stk,.tt.is-nest .tt-tray-w,.tt.is-nest .tt-top-sl .tt-search,.tt.is-nest .tt-dock .tt-rail{display:none}
+.tt-tag.tt-nest-tag{flex:0 1 auto;min-width:0}
+.tt-nest-tag > span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tt.is-nest .tt-cnt{flex:none}
+.tt-nest-grp > .tt-grid{margin-top:var(--nest-top, 0)}
+.tt.has-tray.is-nest .tt-main{padding-bottom:calc(var(--dock-h) + var(--sab) + 32px)}
+@media (max-width:899.98px){ .tt.is-nest{--dock-h:55px} }
+@media (min-width:900px){ .tt.has-tray.is-nest .tt-main{padding-bottom:64px} }
+
+/* A table with a tray (the Selection's hand): room for it over the dock, and the popover clears it */
+.tt.has-tray{--tray-h:68px}
+.tt.has-tray .tt-main{padding-bottom:calc(var(--dock-h) + var(--tray-h) + var(--sab) + 32px)}
+.tt.has-tray .tt-pop{bottom:calc(var(--dock-h) + var(--tray-h) + var(--sab) + 8px)}
+
+/* No match */
+.tt-none{grid-column:1/-1;display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:24px 0}
+.tt-none .tt-tag{height:26px;font-size:15px}
+.tt-btn-line{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border:1px solid var(--line-2);border-radius:var(--r-1);
+  font:700 16px/1 var(--font-display);letter-spacing:.06em;text-transform:uppercase;color:var(--chrome)}
+
+/* Empty table: players see only their own cards */
+.tt-empty{grid-column:1/-1;padding-top:4px}
+.tt-e-cell{position:relative;width:240px;max-width:100%;aspect-ratio:8/15;border:1px solid var(--line-2);border-radius:11.5px;display:grid;place-items:center}
+.tt-e-cell::before{content:"";position:absolute;inset:5px;border:1px solid var(--line);border-radius:7px}
+.tt-e-tag{display:inline-flex;align-items:center;height:30px;padding:0 16px;--nr:6px;background:var(--chrome);color:var(--ground);
+  font:800 17px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase}
+.tt-e-links{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:14px;font:700 16px/1 var(--font-display);letter-spacing:.07em;text-transform:uppercase;color:var(--chrome-3)}
+.tt-e-links a{display:inline-flex;align-items:center;gap:4px;height:44px;padding:0 6px;color:var(--chrome)}
+.tt-e-links a:first-child{margin-left:-6px}
+.tt.is-empty .tt-strip,.tt.is-empty .tt-dock,.tt.is-empty .tt-stk{display:none}
+/* emptyStatus keeps the strip for the status slot alone */
+.tt.is-empty.is-empty-status .tt-strip{display:block}
+.tt.is-empty.is-empty-status .tt-strip-rail{display:none}
+.tt.is-empty .tt-main{padding-bottom:48px}
+
+/* ── Popover (filters, sort) ─────────────────────────────────────────────── */
+.tt-pop{position:fixed;z-index:40;left:var(--padl);right:var(--padr);bottom:calc(var(--dock-h) + var(--sab) + 8px);
+  max-height:min(62vh, 520px);display:flex;flex-direction:column;background:var(--surface);border-radius:var(--r-2);
+  box-shadow:0 0 0 1px var(--line-2), var(--shadow-popover, 0 18px 40px rgba(0,0,0,.55))}
+.tt-pop-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:14px 16px 8px}
+.tt-ph{font:700 15px/1 var(--font-display);letter-spacing:.1em;text-transform:uppercase;color:var(--chrome-2)}
+.tt-pc{font:500 12px/1 var(--font-mono);color:var(--chrome-2)}
+.tt-pc b{font-weight:700;color:var(--chrome)}
+.tt-pop-b{overflow-y:auto;overscroll-behavior:contain;padding:0 6px 6px}
+.tt-pop-row{padding:10px 10px 4px;font:700 12px/1 var(--font-display);letter-spacing:.1em;text-transform:uppercase;color:var(--chrome-3)}
+.tt-opt{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:0 10px;border-radius:4px;color:var(--chrome);font:500 15px/1.2 var(--font-text)}
+.tt-opt + .tt-opt{box-shadow:0 -1px 0 var(--line)}
+.tt-opt:hover{background:var(--opt-hover, rgba(190,198,211,.06))}
+.tt-opt .tt-ck{width:16px;height:16px;flex:none;color:var(--chrome);opacity:0}
+.tt-opt[aria-checked="true"] .tt-ck{opacity:1}
+.tt-opt .tt-mk{width:8px;height:8px;flex:none}
+.tt-ol{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tt-oc{font:500 12px/1 var(--font-mono);color:var(--chrome-2)}
+.tt-opt[aria-checked="false"] .tt-ol{color:var(--chrome-2)}
+.tt-opt[aria-checked="true"] .tt-ol{color:var(--chrome)}
+.tt-opt .tt-ol.is-gold{color:var(--gold)}
+.tt-pop-f{display:flex;justify-content:space-between;gap:8px;padding:6px 10px 10px;border-top:1px solid var(--line)}
+.tt-pop-f button{height:44px;padding:0 12px;border-radius:var(--r-1);font:700 16px/1 var(--font-display);letter-spacing:.06em;text-transform:uppercase;color:var(--chrome-2)}
+.tt-pop-f button:disabled{opacity:.4;cursor:default}
+.tt-pop-f .tt-done{background:var(--chrome);color:var(--ground);padding:0 18px}
+
+/* ── Stage: one card open ───────────────────────────────────────────────── */
+.tt-stage{position:fixed;inset:0;z-index:60;display:none;--cw:337px}
+.tt-stage.is-on{display:block}
+.tt-st-bg{position:absolute;inset:0;background:var(--backdrop)}
+.tt-st-x{position:absolute;z-index:3;top:calc(var(--sat) + 6px);right:max(6px, env(safe-area-inset-right,0px));width:44px;height:44px;display:grid;place-items:center;border-radius:var(--r-1);color:var(--chrome)}
+.tt-st-col{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  padding:calc(var(--sat) + 50px) 24px calc(var(--sab) + 14px);pointer-events:none}
+.tt-st-col > *{pointer-events:auto}
+.tt-st-head{width:var(--cw);height:36px;display:flex;align-items:center;gap:8px;padding:0 6px 0 16px;--nr:5px;background:var(--surface);color:var(--chrome)}
+.tt-st-head .tt-mk{width:8px;height:8px;flex:none}
+.tt-st-head:empty{visibility:hidden} /* 1.4.0: a host head slot that renders nothing draws no ticket; the row keeps its 36 px */
+.tt-st-set{font:800 20px/1 var(--font-display);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;padding-top:1px;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tt-st-pos{font:500 13px/1 var(--font-mono);color:var(--chrome-2);white-space:nowrap}
+.tt-st-gold{width:6px;height:6px;border-radius:50%;background:var(--gold);flex:none}
+.tt-st-want{height:18px;display:inline-flex;align-items:center;padding:0 8px;--nr:4px;background:var(--chrome);color:var(--ground);font:700 10px/1 var(--font-mono);letter-spacing:.06em;flex:none}
+.tt-st-flip{position:relative;margin-left:auto;height:28px;padding:0 10px;border-radius:2px;border:1px solid var(--line-2);flex:none;
+  font:700 14px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:var(--chrome)}
+.tt-st-flip::before{content:"";position:absolute;inset:-8px -4px}
+.tt-st-wrap{position:relative;width:var(--cw);margin-top:10px;perspective:1600px}
+.tt-st-card{position:relative;width:var(--cw);cursor:pointer;touch-action:pan-y;-webkit-tap-highlight-color:transparent;
+  filter:var(--shadow-stage, drop-shadow(0 18px 36px rgba(0,0,0,.55)) drop-shadow(0 2px 2px rgba(0,0,0,.5)))}
+/* A card that prints is cardstock. Its shadow is a drop-shadow on the wrap, over
+   the turning card as drawn, so it narrows on the turn (it flies in from its cell and back), and spreads while the
+   card is lifted for a flip or held under the finger (core/print.js sets data-tt-held). A theme may set --pc-rest and
+   --pc-lift (filter values); unset, the design's dark shadow. The card itself keeps 3D (no filter on it), so the faces
+   and the stock's edge turn in the wrap's perspective: while it flips (is-lifted) the 4 px edge (--pc-stock-t) stands
+   at each side, a paper core between two cut lines. Under the finger
+   tilt (data-tt-tilt) the face leans in the same perspective and rises a little toward the eye; its front takes the
+   whole touch */
+.tt-st-wrap:has(> .tt-st-card > .ttf[data-print]){transition:filter 180ms ease-out;
+  filter:var(--pc-rest, drop-shadow(0 18px 36px rgba(0,0,0,.55)) drop-shadow(0 2px 2px rgba(0,0,0,.5)))}
+.tt-st-wrap:has(> .tt-st-card:is(.is-lifted,[data-tt-held]) > .ttf[data-print]){filter:var(--pc-lift, drop-shadow(0 30px 52px rgba(0,0,0,.55)) drop-shadow(0 4px 6px rgba(0,0,0,.45)))}
+.tt-st-card:has(> .ttf[data-print]){border-radius:4px;filter:none;transform-style:preserve-3d}
+.tt-st-card.is-lifted:has(> .ttf[data-print])::before,.tt-st-card.is-lifted:has(> .ttf[data-print])::after{
+  content:"";position:absolute;top:1px;bottom:1px;width:var(--pc-stock-t, 4px);transform:rotateY(90deg);pointer-events:none;
+  --st-l:var(--edge-line, var(--thf-frame, rgba(40,30,20,.5)));
+  background:linear-gradient(90deg, var(--st-l) 0 1px, var(--edge-core, #DCD4C2) 1px calc(100% - 1px), var(--st-l) calc(100% - 1px))}
+.tt-st-card.is-lifted:has(> .ttf[data-print])::before{left:calc(var(--pc-stock-t, 4px) / -2)}
+.tt-st-card.is-lifted:has(> .ttf[data-print])::after{right:calc(var(--pc-stock-t, 4px) / -2)}
+[data-tt-tilt] .tt-st-card > .ttf[data-print]{transition:translate 180ms ease-out}
+[data-tt-tilt] .tt-st-card[data-tt-held] > .ttf[data-print]:not(.is-under){translate:0 0 24px}
+[data-tt-tilt] .tt-st-card > .ttf-front[data-print]{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+@media (prefers-reduced-motion:reduce){ [data-tt-tilt] .tt-st-card > .ttf[data-print]{transition:none} }
+.tt-st-card > .ttf{width:100%}
+.tt-st-card > .ttf + .ttf{position:absolute;left:0;top:0}
+.tt-st-card .ttf-back .ttf-bk-body{touch-action:pan-y}
+/* A card laid over the open one (TtStage over). The card under keeps its face in place, hidden and
+   inert; the face on top is the one in the flow (every face is 8 / 15 of the same width) */
+.tt-st-card > .ttf.is-under{position:absolute;left:0;top:0;visibility:hidden;opacity:0;pointer-events:none}
+.tt-st-card > .ttf.is-under + .ttf:not(.is-under){position:relative}
+.tt-st-back{position:relative;display:inline-flex;align-items:center;gap:1px;min-width:0;height:28px;margin-left:-10px;padding:0 6px 0 2px;border-radius:2px;
+  font:700 16px/1 var(--font-display);letter-spacing:.06em;text-transform:uppercase;color:var(--chrome);white-space:nowrap}
+.tt-st-back > span{overflow:hidden;text-overflow:ellipsis;padding-top:1px}
+.tt-st-back::before{content:"";position:absolute;inset:-8px -4px}
+.tt-st-act.is-over .tt-st-nav{visibility:hidden}
+.tt-st-act{width:var(--cw);display:flex;align-items:center;gap:8px;margin-top:14px}
+.tt-st-nav{width:44px;height:48px;flex:none;display:grid;place-items:center;border-radius:var(--r-1);border:1px solid var(--line-2);color:var(--chrome)}
+.tt-st-nav:disabled{opacity:.3;cursor:default}
+.tt-st-go{flex:1;min-width:0;height:48px;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 18px;--nr:7px;
+  background:var(--chrome);color:var(--ground);font:800 20px/1 var(--font-display);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.tt-st-go span{overflow:hidden;text-overflow:ellipsis;padding-top:1px}
+.tt-st-go:active{background:var(--chrome-press, #D3D9E2)}
+.tt-st-go:focus-visible{outline:none;background:var(--chrome-focus, #E3E8EF)}
+
+/* ── Ghosts: cards gathering into a pile, or leaving a filter ─────────────── */
+.tt-ghost{position:fixed;z-index:20;margin:0;pointer-events:none;content-visibility:visible}
+
+/* ── Laptop ──────────────────────────────────────────────────────────────── */
+@media (min-width:900px){
+  .tt{--padl:max(32px, env(safe-area-inset-left,0px), calc((100% - 1216px) / 2));--padr:max(32px, env(safe-area-inset-right,0px), calc((100% - 1216px) / 2));
+    --top-h:60px;--strip-h:52px;--dock-h:0px}
+  .tt-top-in{gap:14px}
+  .tt-top-sl{display:flex;align-items:center;gap:20px;margin-left:auto}
+  .tt-top-sl .tt-slrow{width:270px;flex:none;height:48px;padding:0}
+  .tt-stk{margin-left:10px}
+  .tt-strip{display:flex;align-items:center;gap:24px}
+  .tt-ledger{flex:none;width:520px}
+  .tt-lg{padding:0 12px 0 13px}
+  .tt-lg-name{font-size:15px}
+  .tt-lg-fig{font-size:13px}
+  .tt-lg + .tt-lg[aria-current="true"]::after{left:13px}
+  .tt-lg[aria-current="true"]::after{right:12px}
+  .tt-strip-rail{flex:1;min-width:0;display:flex;justify-content:flex-end}
+  .tt-strip-rail .tt-rail{height:52px;padding:0 2px;-webkit-mask:none;mask:none}
+  .tt-dock{display:none}
+  .tt-main{padding-top:28px;padding-bottom:64px}
+  .tt.has-tray .tt-main{padding-bottom:calc(var(--tray-h) + 64px)}
+  .tt.has-tray .tt-pop{bottom:auto}
+  .tt-groups{row-gap:40px;column-gap:16px}
+  .tt-grid{margin-top:16px}
+  .tt-bx-name{font-size:28px}
+  .tt-search{position:relative;right:auto;width:240px;height:40px;box-shadow:none;background:none}
+  .tt-s-btn,.tt-search input,.tt-s-x{height:38px}
+  .tt-search input,.tt-search .tt-s-x{visibility:visible !important}
+  .tt-pop{left:auto;right:auto;bottom:auto;width:300px;max-height:min(70vh, 560px)}
+  .tt-st-nav{position:absolute;top:50%;margin-top:-24px;z-index:2}
+  .tt-st-nav.is-prev{right:calc(50% + var(--cw) / 2 + 28px)}
+  .tt-st-nav.is-next{left:calc(50% + var(--cw) / 2 + 28px)}
+  .tt-st-act{justify-content:center}
+}
+/* The copies the other layout uses (rail and ruler render twice, one shown; no DOM moves, SSR safe) */
+@media (max-width:899.98px){ .tt-strip-rail,.tt-top-sl{display:none !important} }
+/* The open card's stub on a phone, between prev and next: on a stage narrower than 337px (a 360px phone) its side
+   padding, then its type, give way, so "Open in Placecard" stays whole with its arrow. At 337px and wider both resolve
+   to 18px and 20px, as before; the laptop's stub, alone in its row, keeps them at any width */
+@media (max-width:899.98px){
+  .tt-st-act > .tt-st-go{padding:0 clamp(8px, calc((var(--cw) - 301px) / 2), 18px);font-size:clamp(14px, calc((var(--cw) - 144px) / 8.1), 20px)}
+}
+/* 1.2.0: TtTable topRows 2 lays the phone's top bar in two rows (as designed): back, tag and Stack, then the
+   count and the head slot. --top-h follows, so the strip, the sticky offsets and the scroll margins keep their places */
+@media (max-width:899.98px){
+  .tt[data-top-rows="2"]{--top-h:var(--top-h2, 92px)}
+  .tt[data-top-rows="2"] .tt-top-in{flex-wrap:wrap;align-content:center;row-gap:0}
+  .tt[data-top-rows="2"] .tt-top-in::after{content:"";order:2;flex:0 0 100%;height:0}
+  .tt[data-top-rows="2"] .tt-top-in > .tt-stk{order:1;margin-left:auto}
+  .tt[data-top-rows="2"] .tt-top-in > .tt-top-sl{display:none}
+  .tt[data-top-rows="2"] .tt-top-in > .tt-cnt{order:3;min-height:40px;align-items:center}
+  .tt[data-top-rows="2"] .tt-top-in > .tt-cnt ~ :not(.tt-stk):not(.tt-top-sl){order:4}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .tt-chip,.tt-search,.tt-tk span,.tt-grid .tt-cell{transition:none !important}
+}

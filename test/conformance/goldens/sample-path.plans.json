@@ -1,0 +1,618 @@
+{
+  "solver": "path",
+  "cases": [
+    {
+      "name": "open, planned, 30 min, on the estimate",
+      "record": {
+        "id": "plan-01",
+        "app": "treehopper",
+        "set": "th-species",
+        "madeBy": "player:test",
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "path"
+        },
+        "clock": null,
+        "start": {
+          "lat": 40.7359,
+          "lon": -73.9911
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 30,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "see",
+            "card": "Ginkgo",
+            "place": {
+              "id": "tree:105",
+              "lat": 40.735884,
+              "lon": -73.989108
+            },
+            "leg": {
+              "m": 218,
+              "min": 2.7
+            },
+            "arriveMin": 2.7,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          },
+          {
+            "n": 2,
+            "kind": "see",
+            "card": "Silver linden",
+            "place": {
+              "id": "tree:120",
+              "lat": 40.736407,
+              "lon": -73.987625
+            },
+            "leg": {
+              "m": 179,
+              "min": 2.2
+            },
+            "arriveMin": 6,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          },
+          {
+            "n": 3,
+            "kind": "see",
+            "card": "Red maple",
+            "place": {
+              "id": "tree:113",
+              "lat": 40.739403,
+              "lon": -73.989016
+            },
+            "leg": {
+              "m": 457,
+              "min": 5.7
+            },
+            "arriveMin": 12.7,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          },
+          {
+            "n": 4,
+            "kind": "see",
+            "card": "Amur maackia",
+            "place": {
+              "id": "tree:132",
+              "lat": 40.740315,
+              "lon": -73.989011
+            },
+            "leg": {
+              "m": 131,
+              "min": 1.6
+            },
+            "arriveMin": 15.3,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          },
+          {
+            "n": 5,
+            "kind": "see",
+            "card": "Sophora",
+            "place": {
+              "id": "tree:115",
+              "lat": 40.739993,
+              "lon": -73.991174
+            },
+            "leg": {
+              "m": 242,
+              "min": 3
+            },
+            "arriveMin": 19.3,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          },
+          {
+            "n": 6,
+            "kind": "see",
+            "card": "Callery pear",
+            "place": {
+              "id": "tree:103",
+              "lat": 40.741205,
+              "lon": -73.991879
+            },
+            "leg": {
+              "m": 191,
+              "min": 2.4
+            },
+            "arriveMin": 22.7,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 6,
+          "m": 1418,
+          "walkMin": 17.7,
+          "totalMin": 23.7,
+          "timing": "estimate",
+          "leftOver": 12
+        },
+        "leftOver": [
+          {
+            "key": "Pin oak",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "London planetree",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Honeylocust",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Japanese zelkova",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Littleleaf linden",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Norway maple",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Cherry",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "American elm",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Hedge maple",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Swamp white oak",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Sweetgum",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Kentucky coffeetree",
+            "kind": "card",
+            "reason": "no time left"
+          }
+        ],
+        "ext": {}
+      }
+    },
+    {
+      "name": "a destination, planned, 25 min, by bike, on the estimate",
+      "record": {
+        "id": "plan-02",
+        "app": "treehopper",
+        "set": "th-species",
+        "madeBy": "player:test",
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "path"
+        },
+        "clock": null,
+        "start": {
+          "lat": 40.7359,
+          "lon": -73.9911
+        },
+        "end": {
+          "kind": "destination",
+          "at": {
+            "lat": 40.7484,
+            "lon": -73.9857
+          },
+          "name": null
+        },
+        "mode": "bike",
+        "minutes": 25,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "see",
+            "card": "Ginkgo",
+            "place": {
+              "id": "tree:105",
+              "lat": 40.735884,
+              "lon": -73.989108
+            },
+            "leg": {
+              "m": 218,
+              "min": 0.9
+            },
+            "arriveMin": 0.9,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          },
+          {
+            "n": 2,
+            "kind": "see",
+            "card": "Silver linden",
+            "place": {
+              "id": "tree:120",
+              "lat": 40.736407,
+              "lon": -73.987625
+            },
+            "leg": {
+              "m": 179,
+              "min": 0.7
+            },
+            "arriveMin": 2.6,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          },
+          {
+            "n": 3,
+            "kind": "see",
+            "card": "Japanese zelkova",
+            "place": {
+              "id": "tree:107",
+              "lat": 40.738287,
+              "lon": -73.984227
+            },
+            "leg": {
+              "m": 460,
+              "min": 1.8
+            },
+            "arriveMin": 5.4,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          },
+          {
+            "n": 4,
+            "kind": "see",
+            "card": "London planetree",
+            "place": {
+              "id": "tree:101",
+              "lat": 40.740849,
+              "lon": -73.983583
+            },
+            "leg": {
+              "m": 375,
+              "min": 1.5
+            },
+            "arriveMin": 7.9,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          },
+          {
+            "n": 5,
+            "kind": "see",
+            "card": "Red maple",
+            "place": {
+              "id": "tree:113",
+              "lat": 40.739403,
+              "lon": -73.989016
+            },
+            "leg": {
+              "m": 631,
+              "min": 2.5
+            },
+            "arriveMin": 11.5,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          },
+          {
+            "n": 6,
+            "kind": "see",
+            "card": "Sophora",
+            "place": {
+              "id": "tree:115",
+              "lat": 40.739993,
+              "lon": -73.991174
+            },
+            "leg": {
+              "m": 251,
+              "min": 1
+            },
+            "arriveMin": 13.5,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          },
+          {
+            "n": 7,
+            "kind": "see",
+            "card": "Callery pear",
+            "place": {
+              "id": "tree:103",
+              "lat": 40.741205,
+              "lon": -73.991879
+            },
+            "leg": {
+              "m": 191,
+              "min": 0.8
+            },
+            "arriveMin": 15.2,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          },
+          {
+            "n": 8,
+            "kind": "see",
+            "card": "Amur maackia",
+            "place": {
+              "id": "tree:132",
+              "lat": 40.740315,
+              "lon": -73.989011
+            },
+            "leg": {
+              "m": 339,
+              "min": 1.4
+            },
+            "arriveMin": 17.6,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          },
+          {
+            "n": 9,
+            "kind": "see",
+            "card": "Cherry",
+            "place": {
+              "id": "tree:117",
+              "lat": 40.742528,
+              "lon": -73.988121
+            },
+            "leg": {
+              "m": 333,
+              "min": 1.3
+            },
+            "arriveMin": 19.9,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          }
+        ],
+        "finish": {
+          "leg": {
+            "m": 885,
+            "min": 3.5
+          },
+          "arriveMin": 24.4
+        },
+        "totals": {
+          "stops": 9,
+          "m": 3862,
+          "walkMin": 15.4,
+          "totalMin": 24.4,
+          "timing": "estimate",
+          "leftOver": 9
+        },
+        "leftOver": [
+          {
+            "key": "Pin oak",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Honeylocust",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Littleleaf linden",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Norway maple",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "American elm",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Hedge maple",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Swamp white oak",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Sweetgum",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Kentucky coffeetree",
+            "kind": "card",
+            "reason": "no time left"
+          }
+        ],
+        "ext": {}
+      }
+    },
+    {
+      "name": "placed, 15 min, on the estimate",
+      "record": {
+        "id": "plan-03",
+        "app": "treehopper",
+        "set": "th-species",
+        "madeBy": "player:test",
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "path"
+        },
+        "clock": null,
+        "start": {
+          "lat": 40.7359,
+          "lon": -73.9911
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 15,
+        "order": "placed",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "see",
+            "card": "Pin oak",
+            "place": {
+              "id": "tree:100",
+              "lat": 40.734117,
+              "lon": -73.992686
+            },
+            "leg": {
+              "m": 310,
+              "min": 3.9
+            },
+            "arriveMin": 3.9,
+            "dwellMin": 1,
+            "status": "planned",
+            "label": null,
+            "meal": null,
+            "fromHand": true,
+            "alts": []
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 1,
+          "m": 310,
+          "walkMin": 3.9,
+          "totalMin": 4.9,
+          "timing": "estimate",
+          "leftOver": 8
+        },
+        "leftOver": [
+          {
+            "key": "London planetree",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Honeylocust",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Callery pear",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Ginkgo",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Japanese zelkova",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Littleleaf linden",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Red maple",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "Norway maple",
+            "kind": "card",
+            "reason": "no time left"
+          }
+        ],
+        "ext": {}
+      }
+    }
+  ]
+}

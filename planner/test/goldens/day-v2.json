@@ -1,0 +1,2182 @@
+{
+  "source": "the kit's solveDay with Provo's rules over A0's provo-day.json inputs",
+  "cases": [
+    {
+      "name": "an event, two meals and three sights from 1 PM",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-26",
+          "startAt": 780
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 480,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "eat",
+            "card": "ovt:2af9d4c6-05b6-4d20-a37b-c9242c64c073",
+            "place": {
+              "id": "ovt:2af9d4c6-05b6-4d20-a37b-c9242c64c073",
+              "lat": 40.248671,
+              "lon": -111.647064
+            },
+            "leg": {
+              "m": 817,
+              "min": 13
+            },
+            "arriveMin": 0,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Lunch",
+            "meal": "lunch",
+            "fromHand": true,
+            "alts": [
+              "ovt:2af9d4c6-05b6-4d20-a37b-c9242c64c073"
+            ]
+          },
+          {
+            "n": 2,
+            "kind": "see",
+            "card": "ovt:929253c0-7d78-45fe-80e0-355a282d5d0b",
+            "place": {
+              "id": "ovt:929253c0-7d78-45fe-80e0-355a282d5d0b",
+              "lat": 40.249203,
+              "lon": -111.648384
+            },
+            "leg": {
+              "m": 127,
+              "min": 2
+            },
+            "arriveMin": 75,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:929253c0-7d78-45fe-80e0-355a282d5d0b"
+            ]
+          },
+          {
+            "n": 3,
+            "kind": "see",
+            "card": "wd:Q4967319",
+            "place": {
+              "id": "wd:Q4967319",
+              "lat": 40.250833,
+              "lon": -111.648056
+            },
+            "leg": {
+              "m": 183,
+              "min": 3
+            },
+            "arriveMin": 150,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q4967319"
+            ]
+          },
+          {
+            "n": 4,
+            "kind": "eat",
+            "card": "ovt:0ccba339-ca74-4747-97ee-7a41f3cff4f5",
+            "place": {
+              "id": "ovt:0ccba339-ca74-4747-97ee-7a41f3cff4f5",
+              "lat": 40.248569,
+              "lon": -111.647217
+            },
+            "leg": {
+              "m": 262,
+              "min": 4
+            },
+            "arriveMin": 240,
+            "dwellMin": 45,
+            "status": "planned",
+            "label": "Dinner",
+            "meal": "dinner",
+            "fromHand": true,
+            "alts": [
+              "ovt:0ccba339-ca74-4747-97ee-7a41f3cff4f5"
+            ]
+          },
+          {
+            "n": 5,
+            "kind": "event",
+            "card": "ev-halloween-family-night",
+            "place": {
+              "id": "ev-halloween-family-night",
+              "lat": 40.253388,
+              "lon": -111.647151
+            },
+            "leg": {
+              "m": 536,
+              "min": 8
+            },
+            "arriveMin": 300,
+            "dwellMin": 120,
+            "status": "planned",
+            "label": "Event",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ev-halloween-family-night"
+            ]
+          },
+          {
+            "n": 6,
+            "kind": "see",
+            "card": "wd:Q4967315",
+            "place": {
+              "id": "wd:Q4967315",
+              "lat": 40.2528,
+              "lon": -111.647
+            },
+            "leg": {
+              "m": 67,
+              "min": 1
+            },
+            "arriveMin": 435,
+            "dwellMin": 45,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q4967315"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 6,
+          "m": 1991,
+          "walkMin": 31,
+          "totalMin": 480,
+          "timing": "estimate",
+          "leftOver": 0
+        },
+        "leftOver": [],
+        "ext": {}
+      }
+    },
+    {
+      "name": "the same hand as tabletop cards (the ref path)",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-26",
+          "startAt": 780
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 480,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "eat",
+            "card": "ovt:2af9d4c6-05b6-4d20-a37b-c9242c64c073",
+            "place": {
+              "id": "ovt:2af9d4c6-05b6-4d20-a37b-c9242c64c073",
+              "lat": 40.248671,
+              "lon": -111.647064
+            },
+            "leg": {
+              "m": 817,
+              "min": 13
+            },
+            "arriveMin": 0,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Lunch",
+            "meal": "lunch",
+            "fromHand": true,
+            "alts": [
+              "ovt:2af9d4c6-05b6-4d20-a37b-c9242c64c073"
+            ]
+          },
+          {
+            "n": 2,
+            "kind": "see",
+            "card": "ovt:929253c0-7d78-45fe-80e0-355a282d5d0b",
+            "place": {
+              "id": "ovt:929253c0-7d78-45fe-80e0-355a282d5d0b",
+              "lat": 40.249203,
+              "lon": -111.648384
+            },
+            "leg": {
+              "m": 127,
+              "min": 2
+            },
+            "arriveMin": 75,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:929253c0-7d78-45fe-80e0-355a282d5d0b"
+            ]
+          },
+          {
+            "n": 3,
+            "kind": "see",
+            "card": "wd:Q4967319",
+            "place": {
+              "id": "wd:Q4967319",
+              "lat": 40.250833,
+              "lon": -111.648056
+            },
+            "leg": {
+              "m": 183,
+              "min": 3
+            },
+            "arriveMin": 150,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q4967319"
+            ]
+          },
+          {
+            "n": 4,
+            "kind": "eat",
+            "card": "ovt:0ccba339-ca74-4747-97ee-7a41f3cff4f5",
+            "place": {
+              "id": "ovt:0ccba339-ca74-4747-97ee-7a41f3cff4f5",
+              "lat": 40.248569,
+              "lon": -111.647217
+            },
+            "leg": {
+              "m": 262,
+              "min": 4
+            },
+            "arriveMin": 240,
+            "dwellMin": 45,
+            "status": "planned",
+            "label": "Dinner",
+            "meal": "dinner",
+            "fromHand": true,
+            "alts": [
+              "ovt:0ccba339-ca74-4747-97ee-7a41f3cff4f5"
+            ]
+          },
+          {
+            "n": 5,
+            "kind": "event",
+            "card": "ev-halloween-family-night",
+            "place": {
+              "id": "ev-halloween-family-night",
+              "lat": 40.253388,
+              "lon": -111.647151
+            },
+            "leg": {
+              "m": 536,
+              "min": 8
+            },
+            "arriveMin": 300,
+            "dwellMin": 120,
+            "status": "planned",
+            "label": "Event",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ev-halloween-family-night"
+            ]
+          },
+          {
+            "n": 6,
+            "kind": "see",
+            "card": "wd:Q4967315",
+            "place": {
+              "id": "wd:Q4967315",
+              "lat": 40.2528,
+              "lon": -111.647
+            },
+            "leg": {
+              "m": 67,
+              "min": 1
+            },
+            "arriveMin": 435,
+            "dwellMin": 45,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q4967315"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 6,
+          "m": 1991,
+          "walkMin": 31,
+          "totalMin": 480,
+          "timing": "estimate",
+          "leftOver": 0
+        },
+        "leftOver": [],
+        "ext": {}
+      }
+    },
+    {
+      "name": "morning sights, nearest first",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-26",
+          "startAt": 540
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 240,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "see",
+            "card": "ovt:6a955ea7-b292-4490-add0-6dca34a39be3",
+            "place": {
+              "id": "ovt:6a955ea7-b292-4490-add0-6dca34a39be3",
+              "lat": 40.255898,
+              "lon": -111.645348
+            },
+            "leg": {
+              "m": 0,
+              "min": 1
+            },
+            "arriveMin": 0,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:6a955ea7-b292-4490-add0-6dca34a39be3"
+            ]
+          },
+          {
+            "n": 2,
+            "kind": "see",
+            "card": "ovt:929253c0-7d78-45fe-80e0-355a282d5d0b",
+            "place": {
+              "id": "ovt:929253c0-7d78-45fe-80e0-355a282d5d0b",
+              "lat": 40.249203,
+              "lon": -111.648384
+            },
+            "leg": {
+              "m": 788,
+              "min": 12
+            },
+            "arriveMin": 75,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:929253c0-7d78-45fe-80e0-355a282d5d0b"
+            ]
+          },
+          {
+            "n": 3,
+            "kind": "see",
+            "card": "wd:Q131142305",
+            "place": {
+              "id": "wd:Q131142305",
+              "lat": 40.248262,
+              "lon": -111.649806
+            },
+            "leg": {
+              "m": 160,
+              "min": 2
+            },
+            "arriveMin": 150,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q131142305"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 3,
+          "m": 948,
+          "walkMin": 15,
+          "totalMin": 210,
+          "timing": "estimate",
+          "leftOver": 0
+        },
+        "leftOver": [],
+        "ext": {}
+      }
+    },
+    {
+      "name": "museums keep their usual hours",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-27",
+          "startAt": 900
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 360,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "see",
+            "card": "ovt:423b454e-4bbd-4139-963b-076f1c7cf6b6",
+            "place": {
+              "id": "ovt:423b454e-4bbd-4139-963b-076f1c7cf6b6",
+              "lat": 40.257435,
+              "lon": -111.646111
+            },
+            "leg": {
+              "m": 182,
+              "min": 3
+            },
+            "arriveMin": 0,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:423b454e-4bbd-4139-963b-076f1c7cf6b6"
+            ]
+          },
+          {
+            "n": 2,
+            "kind": "see",
+            "card": "wd:Q6904799",
+            "place": {
+              "id": "wd:Q6904799",
+              "lat": 40.2533,
+              "lon": -111.647
+            },
+            "leg": {
+              "m": 466,
+              "min": 7
+            },
+            "arriveMin": 75,
+            "dwellMin": 45,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q6904799"
+            ]
+          },
+          {
+            "n": 3,
+            "kind": "see",
+            "card": "ovt:ffe3923f-e42e-4d41-9c10-f2c7c625f946",
+            "place": {
+              "id": "ovt:ffe3923f-e42e-4d41-9c10-f2c7c625f946",
+              "lat": 40.2491,
+              "lon": -111.646851
+            },
+            "leg": {
+              "m": 467,
+              "min": 7
+            },
+            "arriveMin": 135,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:ffe3923f-e42e-4d41-9c10-f2c7c625f946"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 3,
+          "m": 1116,
+          "walkMin": 17,
+          "totalMin": 195,
+          "timing": "estimate",
+          "leftOver": 1
+        },
+        "leftOver": [
+          {
+            "key": "wd:Q4836911",
+            "kind": "card",
+            "reason": "no time left"
+          }
+        ],
+        "ext": {}
+      }
+    },
+    {
+      "name": "the same with usual hours off",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-27",
+          "startAt": 900
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 360,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "see",
+            "card": "ovt:423b454e-4bbd-4139-963b-076f1c7cf6b6",
+            "place": {
+              "id": "ovt:423b454e-4bbd-4139-963b-076f1c7cf6b6",
+              "lat": 40.257435,
+              "lon": -111.646111
+            },
+            "leg": {
+              "m": 182,
+              "min": 3
+            },
+            "arriveMin": 0,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:423b454e-4bbd-4139-963b-076f1c7cf6b6"
+            ]
+          },
+          {
+            "n": 2,
+            "kind": "see",
+            "card": "wd:Q6904799",
+            "place": {
+              "id": "wd:Q6904799",
+              "lat": 40.2533,
+              "lon": -111.647
+            },
+            "leg": {
+              "m": 466,
+              "min": 7
+            },
+            "arriveMin": 75,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q6904799"
+            ]
+          },
+          {
+            "n": 3,
+            "kind": "see",
+            "card": "ovt:ffe3923f-e42e-4d41-9c10-f2c7c625f946",
+            "place": {
+              "id": "ovt:ffe3923f-e42e-4d41-9c10-f2c7c625f946",
+              "lat": 40.2491,
+              "lon": -111.646851
+            },
+            "leg": {
+              "m": 467,
+              "min": 7
+            },
+            "arriveMin": 150,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:ffe3923f-e42e-4d41-9c10-f2c7c625f946"
+            ]
+          },
+          {
+            "n": 4,
+            "kind": "see",
+            "card": "wd:Q4836911",
+            "place": {
+              "id": "wd:Q4836911",
+              "lat": 40.2564,
+              "lon": -111.657
+            },
+            "leg": {
+              "m": 1184,
+              "min": 18
+            },
+            "arriveMin": 230,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q4836911"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 4,
+          "m": 2299,
+          "walkMin": 35,
+          "totalMin": 290,
+          "timing": "estimate",
+          "leftOver": 0
+        },
+        "leftOver": [],
+        "ext": {}
+      }
+    },
+    {
+      "name": "breakfast, lunch and a cafe with no meal left",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-27",
+          "startAt": 480
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 480,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "eat",
+            "card": "ovt:8e305762-2a17-4df7-9915-d5923f7e3562",
+            "place": {
+              "id": "ovt:8e305762-2a17-4df7-9915-d5923f7e3562",
+              "lat": 40.250845,
+              "lon": -111.647987
+            },
+            "leg": {
+              "m": 605,
+              "min": 9
+            },
+            "arriveMin": 0,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Breakfast",
+            "meal": "breakfast",
+            "fromHand": true,
+            "alts": [
+              "ovt:8e305762-2a17-4df7-9915-d5923f7e3562"
+            ]
+          },
+          {
+            "n": 2,
+            "kind": "eat",
+            "card": "ovt:11bd7379-faf3-43e1-bc09-06366d1242ef",
+            "place": {
+              "id": "ovt:11bd7379-faf3-43e1-bc09-06366d1242ef",
+              "lat": 40.250059,
+              "lon": -111.643425
+            },
+            "leg": {
+              "m": 397,
+              "min": 6
+            },
+            "arriveMin": 75,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Eat",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:11bd7379-faf3-43e1-bc09-06366d1242ef"
+            ]
+          },
+          {
+            "n": 3,
+            "kind": "eat",
+            "card": "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef",
+            "place": {
+              "id": "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef",
+              "lat": 40.254313,
+              "lon": -111.656303
+            },
+            "leg": {
+              "m": 1191,
+              "min": 19
+            },
+            "arriveMin": 155,
+            "dwellMin": 39,
+            "status": "planned",
+            "label": "Eat",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef"
+            ]
+          },
+          {
+            "n": 4,
+            "kind": "eat",
+            "card": "ovt:0cd63944-fa36-4918-8540-bd0e891c36d5",
+            "place": {
+              "id": "ovt:0cd63944-fa36-4918-8540-bd0e891c36d5",
+              "lat": 40.248493,
+              "lon": -111.647438
+            },
+            "leg": {
+              "m": 992,
+              "min": 16
+            },
+            "arriveMin": 210,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Lunch",
+            "meal": "lunch",
+            "fromHand": true,
+            "alts": [
+              "ovt:0cd63944-fa36-4918-8540-bd0e891c36d5"
+            ]
+          },
+          {
+            "n": 5,
+            "kind": "eat",
+            "card": "ovt:224fa09e-952e-4a9c-8781-4e1a7bb147d6",
+            "place": {
+              "id": "ovt:224fa09e-952e-4a9c-8781-4e1a7bb147d6",
+              "lat": 40.251301,
+              "lon": -111.658241
+            },
+            "leg": {
+              "m": 969,
+              "min": 15
+            },
+            "arriveMin": 285,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Eat",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:224fa09e-952e-4a9c-8781-4e1a7bb147d6"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 5,
+          "m": 4154,
+          "walkMin": 65,
+          "totalMin": 345,
+          "timing": "estimate",
+          "leftOver": 0
+        },
+        "leftOver": [],
+        "ext": {}
+      }
+    },
+    {
+      "name": "too much for two hours",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-28",
+          "startAt": 600
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 120,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "see",
+            "card": "wd:Q14711804",
+            "place": {
+              "id": "wd:Q14711804",
+              "lat": 40.2542,
+              "lon": -111.649
+            },
+            "leg": {
+              "m": 363,
+              "min": 6
+            },
+            "arriveMin": 0,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q14711804"
+            ]
+          },
+          {
+            "n": 2,
+            "kind": "see",
+            "card": "wd:Q907890",
+            "place": {
+              "id": "wd:Q907890",
+              "lat": 40.2575,
+              "lon": -111.654444
+            },
+            "leg": {
+              "m": 590,
+              "min": 9
+            },
+            "arriveMin": 75,
+            "dwellMin": 45,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q907890"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 2,
+          "m": 953,
+          "walkMin": 15,
+          "totalMin": 120,
+          "timing": "estimate",
+          "leftOver": 4
+        },
+        "leftOver": [
+          {
+            "key": "wd:Q7177651",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "ovt:9e169f07-5f91-4104-ad63-75fe2fa28b56",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "ovt:cc477ae4-0c83-4659-a5a0-0ebb75b22640",
+            "kind": "card",
+            "reason": "no time left"
+          },
+          {
+            "key": "ovt:30d9fd71-95f0-41b2-873d-27cd808b7f0b",
+            "kind": "card",
+            "reason": "no time left"
+          }
+        ],
+        "ext": {}
+      }
+    },
+    {
+      "name": "an event on a day it is not on, and a key the zone does not have",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-26",
+          "startAt": 840
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 240,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "eat",
+            "card": "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef",
+            "place": {
+              "id": "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef",
+              "lat": 40.254313,
+              "lon": -111.656303
+            },
+            "leg": {
+              "m": 946,
+              "min": 15
+            },
+            "arriveMin": 0,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Eat",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 1,
+          "m": 946,
+          "walkMin": 15,
+          "totalMin": 60,
+          "timing": "estimate",
+          "leftOver": 2
+        },
+        "leftOver": [
+          {
+            "key": "ev-byu-laboween",
+            "kind": "event",
+            "reason": "not on this day"
+          },
+          {
+            "key": "ovt:not-in-provo",
+            "kind": "card",
+            "reason": "no longer listed"
+          }
+        ],
+        "ext": {}
+      }
+    },
+    {
+      "name": "FilmQuest joined late, Autumn Apparitions in the evening",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-28",
+          "startAt": 720
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 480,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "event",
+            "card": "ev-filmquest-film-festival",
+            "place": {
+              "id": "ev-filmquest-film-festival",
+              "lat": 40.2356085,
+              "lon": -111.659179
+            },
+            "leg": {
+              "m": 2543,
+              "min": 40
+            },
+            "arriveMin": 0,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Event",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ev-filmquest-film-festival"
+            ]
+          },
+          {
+            "n": 2,
+            "kind": "see",
+            "card": "ovt:f8cd766d-f0c6-4633-b145-b6105b09a128",
+            "place": {
+              "id": "ovt:f8cd766d-f0c6-4633-b145-b6105b09a128",
+              "lat": 40.249994,
+              "lon": -111.648041
+            },
+            "leg": {
+              "m": 1858,
+              "min": 29
+            },
+            "arriveMin": 90,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:f8cd766d-f0c6-4633-b145-b6105b09a128"
+            ]
+          },
+          {
+            "n": 3,
+            "kind": "event",
+            "card": "ev-autumn-apparitions",
+            "place": {
+              "id": "ev-autumn-apparitions",
+              "lat": 40.257523,
+              "lon": -111.663618
+            },
+            "leg": {
+              "m": 1565,
+              "min": 24
+            },
+            "arriveMin": 240,
+            "dwellMin": 120,
+            "status": "planned",
+            "label": "Event",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ev-autumn-apparitions"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 3,
+          "m": 5966,
+          "walkMin": 93,
+          "totalMin": 360,
+          "timing": "estimate",
+          "leftOver": 0
+        },
+        "leftOver": [],
+        "ext": {}
+      }
+    },
+    {
+      "name": "no window",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": null,
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": null,
+        "order": "planned",
+        "stops": [],
+        "finish": null,
+        "totals": {
+          "stops": 0,
+          "m": 0,
+          "walkMin": 0,
+          "totalMin": 0,
+          "timing": "estimate",
+          "leftOver": 1
+        },
+        "leftOver": [
+          {
+            "key": "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef",
+            "kind": "card",
+            "reason": "no window"
+          }
+        ],
+        "ext": {}
+      }
+    },
+    {
+      "name": "Deal me a hand: an empty hand, filled, seed 1",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-28",
+          "startAt": 600
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 480,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "see",
+            "card": "wd:Q332498",
+            "place": {
+              "id": "wd:Q332498",
+              "lat": 40.249722,
+              "lon": -111.649167
+            },
+            "leg": {
+              "m": 760,
+              "min": 12
+            },
+            "arriveMin": 0,
+            "dwellMin": 32,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": false,
+            "alts": [
+              "wd:Q332498",
+              "ovt:f8cd766d-f0c6-4633-b145-b6105b09a128",
+              "wd:Q4967319",
+              "ovt:d2688cbd-25ac-4e79-9617-951b6d9230b8",
+              "ovt:ffe3923f-e42e-4d41-9c10-f2c7c625f946",
+              "ovt:929253c0-7d78-45fe-80e0-355a282d5d0b"
+            ]
+          },
+          {
+            "n": 2,
+            "kind": "event",
+            "card": "ev-filmquest-film-festival",
+            "place": {
+              "id": "ev-filmquest-film-festival",
+              "lat": 40.2356085,
+              "lon": -111.659179
+            },
+            "leg": {
+              "m": 1785,
+              "min": 28
+            },
+            "arriveMin": 60,
+            "dwellMin": 120,
+            "status": "planned",
+            "label": "Event",
+            "meal": null,
+            "fromHand": false,
+            "alts": [
+              "ev-filmquest-film-festival"
+            ]
+          },
+          {
+            "n": 3,
+            "kind": "eat",
+            "card": "ovt:6f9db524-737f-4811-9ab1-b512fc794b8f",
+            "place": {
+              "id": "ovt:6f9db524-737f-4811-9ab1-b512fc794b8f",
+              "lat": 40.247162,
+              "lon": -111.650253
+            },
+            "leg": {
+              "m": 1491,
+              "min": 23
+            },
+            "arriveMin": 205,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Lunch",
+            "meal": "lunch",
+            "fromHand": false,
+            "alts": [
+              "ovt:6f9db524-737f-4811-9ab1-b512fc794b8f"
+            ]
+          },
+          {
+            "n": 4,
+            "kind": "see",
+            "card": "wd:Q5921166",
+            "place": {
+              "id": "wd:Q5921166",
+              "lat": 40.2497,
+              "lon": -111.645
+            },
+            "leg": {
+              "m": 528,
+              "min": 8
+            },
+            "arriveMin": 280,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": false,
+            "alts": [
+              "wd:Q5921166",
+              "wd:Q6904799",
+              "wd:Q131142305",
+              "wd:Q14711804",
+              "ovt:e6135472-a7a0-4c86-94cf-b57f05cb07b7",
+              "wd:Q7177651"
+            ]
+          },
+          {
+            "n": 5,
+            "kind": "see",
+            "card": "wd:Q4967315",
+            "place": {
+              "id": "wd:Q4967315",
+              "lat": 40.2528,
+              "lon": -111.647
+            },
+            "leg": {
+              "m": 384,
+              "min": 6
+            },
+            "arriveMin": 355,
+            "dwellMin": 50,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": false,
+            "alts": [
+              "wd:Q4967315",
+              "wd:Q4836911",
+              "wd:Q1507167",
+              "wd:Q907890",
+              "wd:Q6490444",
+              "wd:Q14711777"
+            ]
+          },
+          {
+            "n": 6,
+            "kind": "eat",
+            "card": "ovt:41c7da65-900a-4ccf-ae3c-b482caabf791",
+            "place": {
+              "id": "ovt:41c7da65-900a-4ccf-ae3c-b482caabf791",
+              "lat": 40.250456,
+              "lon": -111.652908
+            },
+            "leg": {
+              "m": 565,
+              "min": 9
+            },
+            "arriveMin": 420,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Dinner",
+            "meal": "dinner",
+            "fromHand": false,
+            "alts": [
+              "ovt:41c7da65-900a-4ccf-ae3c-b482caabf791",
+              "ovt:2af9d4c6-05b6-4d20-a37b-c9242c64c073",
+              "ovt:3c522172-35f7-4f46-a56b-5601539cf72c",
+              "ovt:0cd63944-fa36-4918-8540-bd0e891c36d5",
+              "ovt:0ccba339-ca74-4747-97ee-7a41f3cff4f5"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 6,
+          "m": 5513,
+          "walkMin": 86,
+          "totalMin": 480,
+          "timing": "estimate",
+          "leftOver": 0
+        },
+        "leftOver": [],
+        "ext": {}
+      }
+    },
+    {
+      "name": "own cards and the fill, family and date night, seed 7",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-29",
+          "startAt": 900
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 360,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "see",
+            "card": "wd:Q907890",
+            "place": {
+              "id": "wd:Q907890",
+              "lat": 40.2575,
+              "lon": -111.654444
+            },
+            "leg": {
+              "m": 792,
+              "min": 12
+            },
+            "arriveMin": 0,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q907890"
+            ]
+          },
+          {
+            "n": 2,
+            "kind": "see",
+            "card": "wd:Q4836911",
+            "place": {
+              "id": "wd:Q4836911",
+              "lat": 40.2564,
+              "lon": -111.657
+            },
+            "leg": {
+              "m": 249,
+              "min": 4
+            },
+            "arriveMin": 75,
+            "dwellMin": 30,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": false,
+            "alts": [
+              "wd:Q4836911",
+              "wd:Q4967315",
+              "wd:Q4967319",
+              "wd:Q6904799",
+              "ovt:9e169f07-5f91-4104-ad63-75fe2fa28b56"
+            ]
+          },
+          {
+            "n": 3,
+            "kind": "eat",
+            "card": "ovt:3c522172-35f7-4f46-a56b-5601539cf72c",
+            "place": {
+              "id": "ovt:3c522172-35f7-4f46-a56b-5601539cf72c",
+              "lat": 40.252325,
+              "lon": -111.652863
+            },
+            "leg": {
+              "m": 573,
+              "min": 9
+            },
+            "arriveMin": 120,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Dinner",
+            "meal": "dinner",
+            "fromHand": false,
+            "alts": [
+              "ovt:3c522172-35f7-4f46-a56b-5601539cf72c",
+              "ovt:41c7da65-900a-4ccf-ae3c-b482caabf791",
+              "ovt:0cd63944-fa36-4918-8540-bd0e891c36d5",
+              "ovt:2af9d4c6-05b6-4d20-a37b-c9242c64c073",
+              "ovt:0ccba339-ca74-4747-97ee-7a41f3cff4f5"
+            ]
+          },
+          {
+            "n": 4,
+            "kind": "see",
+            "card": "ovt:d2688cbd-25ac-4e79-9617-951b6d9230b8",
+            "place": {
+              "id": "ovt:d2688cbd-25ac-4e79-9617-951b6d9230b8",
+              "lat": 40.248474,
+              "lon": -111.64624
+            },
+            "leg": {
+              "m": 707,
+              "min": 11
+            },
+            "arriveMin": 195,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": false,
+            "alts": [
+              "ovt:d2688cbd-25ac-4e79-9617-951b6d9230b8",
+              "ovt:645fa685-c3e6-4e4d-b2df-d6051f91d7f1",
+              "ovt:f8cd766d-f0c6-4633-b145-b6105b09a128",
+              "ovt:ffe3923f-e42e-4d41-9c10-f2c7c625f946",
+              "ovt:e6135472-a7a0-4c86-94cf-b57f05cb07b7",
+              "ovt:cc477ae4-0c83-4659-a5a0-0ebb75b22640"
+            ]
+          },
+          {
+            "n": 5,
+            "kind": "see",
+            "card": "wd:Q332498",
+            "place": {
+              "id": "wd:Q332498",
+              "lat": 40.249722,
+              "lon": -111.649167
+            },
+            "leg": {
+              "m": 285,
+              "min": 4
+            },
+            "arriveMin": 270,
+            "dwellMin": 45,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": false,
+            "alts": [
+              "wd:Q332498",
+              "wd:Q131142305",
+              "wd:Q5921166",
+              "wd:Q14711804",
+              "wd:Q6490444",
+              "ovt:929253c0-7d78-45fe-80e0-355a282d5d0b"
+            ]
+          },
+          {
+            "n": 6,
+            "kind": "eat",
+            "card": "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef",
+            "place": {
+              "id": "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef",
+              "lat": 40.254313,
+              "lon": -111.656303
+            },
+            "leg": {
+              "m": 792,
+              "min": 12
+            },
+            "arriveMin": 330,
+            "dwellMin": 30,
+            "status": "planned",
+            "label": "Dessert",
+            "meal": "late",
+            "fromHand": true,
+            "alts": [
+              "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 6,
+          "m": 3397,
+          "walkMin": 52,
+          "totalMin": 360,
+          "timing": "estimate",
+          "leftOver": 0
+        },
+        "leftOver": [],
+        "ext": {}
+      }
+    },
+    {
+      "name": "the fill, seed 42, a short morning",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-30",
+          "startAt": 540
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 120,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "see",
+            "card": "wd:Q332498",
+            "place": {
+              "id": "wd:Q332498",
+              "lat": 40.249722,
+              "lon": -111.649167
+            },
+            "leg": {
+              "m": 760,
+              "min": 12
+            },
+            "arriveMin": 0,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q332498"
+            ]
+          },
+          {
+            "n": 2,
+            "kind": "see",
+            "card": "wd:Q4967319",
+            "place": {
+              "id": "wd:Q4967319",
+              "lat": 40.250833,
+              "lon": -111.648056
+            },
+            "leg": {
+              "m": 155,
+              "min": 2
+            },
+            "arriveMin": 75,
+            "dwellMin": 45,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": false,
+            "alts": [
+              "wd:Q4967319",
+              "wd:Q6904799",
+              "ovt:929253c0-7d78-45fe-80e0-355a282d5d0b",
+              "wd:Q5921166",
+              "wd:Q14711804",
+              "wd:Q131142305"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 2,
+          "m": 915,
+          "walkMin": 14,
+          "totalMin": 120,
+          "timing": "estimate",
+          "leftOver": 0
+        },
+        "leftOver": [],
+        "ext": {}
+      }
+    },
+    {
+      "name": "demo 2026-10-26",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-26",
+          "startAt": 780
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 360,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "eat",
+            "card": "ovt:3c522172-35f7-4f46-a56b-5601539cf72c",
+            "place": {
+              "id": "ovt:3c522172-35f7-4f46-a56b-5601539cf72c",
+              "lat": 40.252325,
+              "lon": -111.652863
+            },
+            "leg": {
+              "m": 751,
+              "min": 12
+            },
+            "arriveMin": 0,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Lunch",
+            "meal": "lunch",
+            "fromHand": true,
+            "alts": [
+              "ovt:3c522172-35f7-4f46-a56b-5601539cf72c"
+            ]
+          },
+          {
+            "n": 2,
+            "kind": "eat",
+            "card": "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef",
+            "place": {
+              "id": "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef",
+              "lat": 40.254313,
+              "lon": -111.656303
+            },
+            "leg": {
+              "m": 366,
+              "min": 6
+            },
+            "arriveMin": 75,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Eat",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef"
+            ]
+          },
+          {
+            "n": 3,
+            "kind": "see",
+            "card": "wd:Q6904799",
+            "place": {
+              "id": "wd:Q6904799",
+              "lat": 40.2533,
+              "lon": -111.647
+            },
+            "leg": {
+              "m": 797,
+              "min": 12
+            },
+            "arriveMin": 150,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q6904799"
+            ]
+          },
+          {
+            "n": 4,
+            "kind": "see",
+            "card": "wd:Q4967315",
+            "place": {
+              "id": "wd:Q4967315",
+              "lat": 40.2528,
+              "lon": -111.647
+            },
+            "leg": {
+              "m": 56,
+              "min": 1
+            },
+            "arriveMin": 225,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q4967315"
+            ]
+          },
+          {
+            "n": 5,
+            "kind": "event",
+            "card": "ev-halloween-family-night",
+            "place": {
+              "id": "ev-halloween-family-night",
+              "lat": 40.253388,
+              "lon": -111.647151
+            },
+            "leg": {
+              "m": 67,
+              "min": 1
+            },
+            "arriveMin": 300,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Event",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ev-halloween-family-night"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 5,
+          "m": 2037,
+          "walkMin": 32,
+          "totalMin": 360,
+          "timing": "estimate",
+          "leftOver": 0
+        },
+        "leftOver": [],
+        "ext": {}
+      }
+    },
+    {
+      "name": "demo 2026-10-28",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-28",
+          "startAt": 780
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 360,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "eat",
+            "card": "ovt:3c522172-35f7-4f46-a56b-5601539cf72c",
+            "place": {
+              "id": "ovt:3c522172-35f7-4f46-a56b-5601539cf72c",
+              "lat": 40.252325,
+              "lon": -111.652863
+            },
+            "leg": {
+              "m": 751,
+              "min": 12
+            },
+            "arriveMin": 0,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Lunch",
+            "meal": "lunch",
+            "fromHand": true,
+            "alts": [
+              "ovt:3c522172-35f7-4f46-a56b-5601539cf72c"
+            ]
+          },
+          {
+            "n": 2,
+            "kind": "eat",
+            "card": "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef",
+            "place": {
+              "id": "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef",
+              "lat": 40.254313,
+              "lon": -111.656303
+            },
+            "leg": {
+              "m": 366,
+              "min": 6
+            },
+            "arriveMin": 75,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Eat",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef"
+            ]
+          },
+          {
+            "n": 3,
+            "kind": "event",
+            "card": "ev-autumn-apparitions",
+            "place": {
+              "id": "ev-autumn-apparitions",
+              "lat": 40.257523,
+              "lon": -111.663618
+            },
+            "leg": {
+              "m": 716,
+              "min": 11
+            },
+            "arriveMin": 180,
+            "dwellMin": 120,
+            "status": "planned",
+            "label": "Event",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ev-autumn-apparitions"
+            ]
+          },
+          {
+            "n": 4,
+            "kind": "see",
+            "card": "wd:Q4967315",
+            "place": {
+              "id": "wd:Q4967315",
+              "lat": 40.2528,
+              "lon": -111.647
+            },
+            "leg": {
+              "m": 1505,
+              "min": 24
+            },
+            "arriveMin": 325,
+            "dwellMin": 35,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q4967315"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 4,
+          "m": 3338,
+          "walkMin": 53,
+          "totalMin": 360,
+          "timing": "estimate",
+          "leftOver": 1
+        },
+        "leftOver": [
+          {
+            "key": "wd:Q6904799",
+            "kind": "card",
+            "reason": "no time left"
+          }
+        ],
+        "ext": {}
+      }
+    },
+    {
+      "name": "demo 2026-10-30",
+      "record": {
+        "id": "day-test",
+        "app": "verythere",
+        "set": "provo-foundational",
+        "madeBy": null,
+        "madeAt": "2026-10-28T12:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-30",
+          "startAt": 780
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 360,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "eat",
+            "card": "ovt:3c522172-35f7-4f46-a56b-5601539cf72c",
+            "place": {
+              "id": "ovt:3c522172-35f7-4f46-a56b-5601539cf72c",
+              "lat": 40.252325,
+              "lon": -111.652863
+            },
+            "leg": {
+              "m": 751,
+              "min": 12
+            },
+            "arriveMin": 0,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Lunch",
+            "meal": "lunch",
+            "fromHand": true,
+            "alts": [
+              "ovt:3c522172-35f7-4f46-a56b-5601539cf72c"
+            ]
+          },
+          {
+            "n": 2,
+            "kind": "see",
+            "card": "wd:Q4967315",
+            "place": {
+              "id": "wd:Q4967315",
+              "lat": 40.2528,
+              "lon": -111.647
+            },
+            "leg": {
+              "m": 500,
+              "min": 8
+            },
+            "arriveMin": 75,
+            "dwellMin": 30,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "wd:Q4967315"
+            ]
+          },
+          {
+            "n": 3,
+            "kind": "event",
+            "card": "ev-byu-laboween",
+            "place": {
+              "id": "ev-byu-laboween",
+              "lat": 40.24835,
+              "lon": -111.645945
+            },
+            "leg": {
+              "m": 503,
+              "min": 8
+            },
+            "arriveMin": 120,
+            "dwellMin": 120,
+            "status": "planned",
+            "label": "Event",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ev-byu-laboween"
+            ]
+          },
+          {
+            "n": 4,
+            "kind": "eat",
+            "card": "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef",
+            "place": {
+              "id": "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef",
+              "lat": 40.254313,
+              "lon": -111.656303
+            },
+            "leg": {
+              "m": 1101,
+              "min": 17
+            },
+            "arriveMin": 260,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Eat",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:2a6aef69-d990-4e79-a05d-b982aa0acaef"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 4,
+          "m": 2856,
+          "walkMin": 45,
+          "totalMin": 320,
+          "timing": "estimate",
+          "leftOver": 1
+        },
+        "leftOver": [
+          {
+            "key": "wd:Q6904799",
+            "kind": "card",
+            "reason": "no time left"
+          }
+        ],
+        "ext": {}
+      }
+    }
+  ]
+}

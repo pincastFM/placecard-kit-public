@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowJs": false,
+    "types": ["node"],
+    "paths": {
+      "@pincast/placecard-kit/planner": ["./planner/index.ts"],
+      "@pincast/placecard-kit/contract": ["./contract/index.ts"],
+      "@pincast/placecard-kit/arrival": ["./arrival/index.ts"]
+    }
+  },
+  "include": ["contract/**/*.ts", "planner/**/*.ts", "arrival/**/*.ts", "core/**/*.d.ts", "nav/**/*.d.ts", "vue/**/*.d.ts", "conformance/**/*.d.ts", "moderation/**/*.d.ts", "registry/**/*.d.ts", "test/types/**/*.ts"],
+  "exclude": ["node_modules", "**/.pinned/**"]
+}

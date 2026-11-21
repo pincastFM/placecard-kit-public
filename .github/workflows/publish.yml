@@ -1,0 +1,42 @@
+# A tag v<version> publishes @pincast/placecard-kit to npm, after the same checks.
+# npm trusts this workflow by its file name (trusted publishing), so no publish token is stored
+# anywhere. npm can only trust a workflow once a package's first version exists, so a version
+# that is already on npm is skipped here instead of failing the run.
+name: Publish
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: An npm that supports trusted publishing
+        run: npm install -g npm@11.21.2
+      - run: npm ci
+      - name: The tag names the package's version
+        run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
+      - run: npm run typecheck
+      - run: npm test
+      - name: Is this version already on npm
+        id: npm
+        run: |
+          spec="$(node -p "const p = require('./package.json'); p.name + '@' + p.version")"
+          version="$(node -p "require('./package.json').version")"
+          found="$(npm view "$spec" version --registry https://registry.npmjs.org 2>/dev/null || true)"
+          if [ "$found" = "$version" ]; then
+            echo "$spec is already on npm, nothing to publish"
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.npm.outputs.published != 'true'
+        run: npm publish

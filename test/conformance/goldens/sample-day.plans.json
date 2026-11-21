@@ -1,0 +1,163 @@
+{
+  "solver": "day",
+  "cases": [
+    {
+      "name": "three cards from 1 PM",
+      "record": {
+        "id": "day-1",
+        "app": "verythere",
+        "set": "town",
+        "madeBy": null,
+        "madeAt": "2026-10-28T16:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": {
+          "tz": "America/Denver",
+          "date": "2026-10-28",
+          "startAt": 780
+        },
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": 240,
+        "order": "planned",
+        "stops": [
+          {
+            "n": 1,
+            "kind": "eat",
+            "card": "ovt:aloha",
+            "place": {
+              "id": "ovt:aloha",
+              "lat": 40.248671,
+              "lon": -111.647064
+            },
+            "leg": {
+              "m": 817,
+              "min": 10
+            },
+            "arriveMin": 0,
+            "dwellMin": 60,
+            "status": "planned",
+            "label": "Lunch",
+            "meal": "lunch",
+            "fromHand": true,
+            "alts": [
+              "ovt:aloha"
+            ]
+          },
+          {
+            "n": 2,
+            "kind": "see",
+            "card": "ovt:square",
+            "place": {
+              "id": "ovt:square",
+              "lat": 40.249203,
+              "lon": -111.648384
+            },
+            "leg": {
+              "m": 127,
+              "min": 2
+            },
+            "arriveMin": 70,
+            "dwellMin": 45,
+            "status": "planned",
+            "label": "See",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:square"
+            ]
+          },
+          {
+            "n": 3,
+            "kind": "eat",
+            "card": "ovt:swig",
+            "place": {
+              "id": "ovt:swig",
+              "lat": 40.254313,
+              "lon": -111.656303
+            },
+            "leg": {
+              "m": 880,
+              "min": 11
+            },
+            "arriveMin": 130,
+            "dwellMin": 45,
+            "status": "planned",
+            "label": "Eat",
+            "meal": null,
+            "fromHand": true,
+            "alts": [
+              "ovt:swig"
+            ]
+          }
+        ],
+        "finish": null,
+        "totals": {
+          "stops": 3,
+          "m": 1824,
+          "walkMin": 23,
+          "totalMin": 175,
+          "timing": "estimate",
+          "leftOver": 0
+        },
+        "leftOver": [],
+        "ext": {}
+      }
+    },
+    {
+      "name": "no window",
+      "record": {
+        "id": "day-2",
+        "app": "verythere",
+        "set": "town",
+        "madeBy": null,
+        "madeAt": "2026-10-28T16:00:00.000Z",
+        "planVersion": 2,
+        "solver": {
+          "id": "day"
+        },
+        "clock": null,
+        "start": {
+          "lat": 40.2559,
+          "lon": -111.64535
+        },
+        "end": {
+          "kind": "open",
+          "at": null,
+          "name": null
+        },
+        "mode": "walk",
+        "minutes": null,
+        "order": "planned",
+        "stops": [],
+        "finish": null,
+        "totals": {
+          "stops": 0,
+          "m": 0,
+          "walkMin": 0,
+          "totalMin": 0,
+          "timing": "estimate",
+          "leftOver": 1
+        },
+        "leftOver": [
+          {
+            "key": "ovt:swig",
+            "kind": "card",
+            "reason": "no window"
+          }
+        ],
+        "ext": {}
+      }
+    }
+  ]
+}
