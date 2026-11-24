@@ -1,6 +1,6 @@
 {
   "name": "@pincast/placecard-kit",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Vue components and logic for a table of collectible cards: sort, filter, flip, plan a walk. Any app can draw its own cards with it.",
   "keywords": [
     "vue",
