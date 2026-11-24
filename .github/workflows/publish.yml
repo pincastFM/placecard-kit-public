@@ -38,5 +38,9 @@ jobs:
           else
             echo "published=false" >> "$GITHUB_OUTPUT"
           fi
+      - name: What npm needs to sign in by trusted publishing
+        run: |
+          echo "npm $(npm --version)"
+          if [ -n "$ACTIONS_ID_TOKEN_REQUEST_URL" ]; then echo "GitHub OIDC token: available"; else echo "GitHub OIDC token: NOT available (id-token: write missing)"; fi
       - if: steps.npm.outputs.published != 'true'
-        run: npm publish
+        run: npm publish --loglevel verbose
