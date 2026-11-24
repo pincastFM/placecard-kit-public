@@ -430,4 +430,9 @@ describe('css/moderation.css', () => {
     postcss.parse(CSS).walkRules(r => r.selectors.forEach(s => { if (/(^|[\s>+~])button$/.test(s.trim())) bare.push(s.trim()) }))
     expect(bare).toEqual([':where(.tt-mod) button'])
   })
+  it('keeps Retry in a failure line at the line\'s own size, not .8125em of .8125em (1.6.2)', () => {
+    let size = null
+    postcss.parse(CSS).walkRules(r => { if (r.selectors.includes('.tt-mod-err .tt-mod-link')) r.walkDecls('font-size', d => { size = d.value }) })
+    expect(size).toBe('1em')
+  })
 })

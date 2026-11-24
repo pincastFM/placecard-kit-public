@@ -42,6 +42,8 @@
 .tt-mod-state{display:inline-flex;align-items:center;min-height:32px;padding:0 6px;font-size:.8125em;font-weight:600;
   color:var(--tt-mod-ink-2, currentColor)}
 .tt-mod-err{font-size:.8125em;font-weight:600}
+/* Retry sits in the failure line, which is already .8125em: at 1em it matches "Failed" beside it instead of compounding to .66em */
+.tt-mod-err .tt-mod-link{font-size:1em}
 
 /* the owner's mark: Pending, Declined, Hidden */
 .tt-mod-chip{display:inline-flex;align-items:center;min-height:20px;padding:0 8px;border:1px solid var(--tt-mod-line, color-mix(in srgb, currentColor 24%, transparent));
