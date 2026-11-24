@@ -11,7 +11,7 @@
         <span v-if="inNest" class="tt-tag tt-stub tt-nest-tag"><span>{{ T.nestCard.title }}</span></span>
         <span v-else-if="tag" class="tt-tag tt-stub">{{ tag }}</span>
         <span ref="cntEl" class="tt-cnt" aria-live="polite">
-          <b>{{ inNest ? nestFig.n : counter ? fmtN(counter.n) : empty ? 0 : heldShown.toLocaleString('en-US') }}</b><span class="tt-cl">{{ inNest ? nestFig.of : counter ? `${W.of} ${fmtN(counter.of)}` : W.cards }}</span>
+          <b>{{ inNest ? nestFig.n : counter ? fmtN(counter.n) : empty ? 0 : heldShown.toLocaleString('en-US') }}</b><span class="tt-cl">{{ inNest ? nestFig.of : counter ? `${W.of} ${fmtN(counter.of)}` : cardsWord(empty ? 0 : heldShown) }}</span>
           <span v-if="!empty && T.filter.missing === true && missShown && !inNest" ref="cmEl" class="tt-cm tt-stub" :aria-label="`${missShown} missing`">+<b>{{ missShown }}</b>&nbsp;{{ W.wanted }}</span>
         </span>
         <slot v-if="!inNest" name="head" :t="T" />
@@ -289,6 +289,15 @@ const TT_WORDS = Object.freeze({
   front: 'Front', back: 'Back', story: 'Species story', held: 'Held', missing: 'Missing', all: 'All',
 })
 const W = computed(() => ({ ...TT_WORDS, ...(props.labels || {}) }))
+// 1.6.1: the head's count word agrees with its number: "1 Card", "0 Cards", "2 Cards". labels.card names the one;
+// a host that sets labels.cards and not labels.card keeps its own word at one, as before. Kept out of TT_WORDS so the
+// words handed to TtFace and TtStage are as before
+const TT_ONE_CARD = 'Card'
+const cardsWord = (n) => {
+  if (Number(n) !== 1) return W.value.cards
+  const l = props.labels || {}
+  return l.card != null ? l.card : l.cards != null ? l.cards : TT_ONE_CARD
+}
 const fmtN = v => (Number.isFinite(Number(v)) ? Number(v).toLocaleString('en-US') : '')
 // A set's points beside its count, "· 120 pts", only when crHead gives them (text, so an unset one leaves no node)
 const ptsOf = h => (h && h.pts != null ? ` · ${h.pts.toLocaleString('en-US')} ${W.value.pts}` : '')
@@ -421,7 +430,7 @@ const inNest = computed(() => T.nest != null && T.nestCards.length > 0)
 const nestBack = computed(() => W.value.nestBack || props.tag || 'Back')
 const nestFig = computed(() => {
   const c = T.nestCount || { n: 0, of: null }
-  return { n: fmtN(c.n), of: c.of != null ? `${W.value.of} ${fmtN(c.of)}` : W.value.cards }
+  return { n: fmtN(c.n), of: c.of != null ? `${W.value.of} ${fmtN(c.of)}` : cardsWord(c.n) }
 })
 const nestLabel = (c) => { const n = T.nestOf(c).cards.length; return `${c.title}${retiredSaid(c)}, ${n} ${n === 1 ? W.value.child : W.value.children}` }
 const nestCellLabel = c => `${[c.title, setName(c.set)].filter(Boolean).join(', ')}${c.held === false ? ', missing' : ''}${retiredSaid(c)}`

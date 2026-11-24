@@ -236,3 +236,4 @@ What each version added:
   - A face's fonts reach the head once a card that needs them arrives, so a Studio or Treehopper card on a `createTabletop` table gets its own type.
   - A registry card with its own `url` (http or https) opens that page, in a new tab, and its button reads "Open in" and the app's name. With no `url` it opens Placecard's card page. A set's own `action` still wins.
   - The Studio foot always prints the app's name and site, drops the site's `https://`, and links the name to the app on an open card.
+- **1.6.1:** the table's head says "1 Card" at one card, where it said "1 Cards" (`labels.card`; an app that sets `labels.cards` alone keeps its word). No face changes.
