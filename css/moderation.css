@@ -24,7 +24,10 @@
 
 .tt-mod{color:var(--tt-mod-ink);font-family:var(--tt-mod-font)}
 .tt-mod p{margin:0}
-.tt-mod button{font:inherit;color:inherit;margin:0;-webkit-tap-highlight-color:transparent}
+/* the reset on a bare button sits in :where(.tt-mod), as table.css's does in :where(.tt): at (0,0,1) it yields to the
+   part classes (.tt-mod-link, .tt-mod-btn, .tt-mod-tab, .tt-mod-switch), so each keeps its own type, colour and
+   margin, and a button with no class (a host's, in TtModQueue's row slot) still takes the text around it */
+:where(.tt-mod) button{font:inherit;color:inherit;margin:0;-webkit-tap-highlight-color:transparent}
 .tt-mod button:focus-visible,.tt-mod-reason:has(input:focus-visible),.tt-mod-state:focus-visible{outline:2px solid var(--tt-mod-focus, currentColor);outline-offset:2px}
 .tt-mod-state:focus:not(:focus-visible){outline:none}
 .tt-mod button:disabled{cursor:default;opacity:.5}

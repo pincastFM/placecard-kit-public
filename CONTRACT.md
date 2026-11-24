@@ -237,3 +237,4 @@ What each version added:
   - A registry card with its own `url` (http or https) opens that page, in a new tab, and its button reads "Open in" and the app's name. With no `url` it opens Placecard's card page. A set's own `action` still wins.
   - The Studio foot always prints the app's name and site, drops the site's `https://`, and links the name to the app on an open card.
 - **1.6.1:** the table's head says "1 Card" at one card, where it said "1 Cards" (`labels.card`; an app that sets `labels.cards` alone keeps its word). No face changes.
+- **1.6.2:** the moderation parts' buttons take their own type again: Report, Hide, Restore and Retry at .8125em and weight 600, the sheet's and the queue's buttons at .875em, all in `--tt-mod-font-label`. A tab not chosen and a switch at Off read `--tt-mod-ink-2`, and a tab sits on the tabs' rule. `css/moderation.css` only. No face changes.

@@ -425,4 +425,9 @@ describe('css/moderation.css', () => {
     expect(ns.every(c => c.startsWith('tt-mod'))).toBe(true)
     expect([...cls].filter(c => !ns.includes(c)).sort()).toEqual(['has-thumb', 'is-on', 'is-open', 'is-primary'])
   })
+  it('resets a bare button in :where(.tt-mod) only, so a part class on a button keeps its type, colour and margin (1.6.2)', () => {
+    const bare = []
+    postcss.parse(CSS).walkRules(r => r.selectors.forEach(s => { if (/(^|[\s>+~])button$/.test(s.trim())) bare.push(s.trim()) }))
+    expect(bare).toEqual([':where(.tt-mod) button'])
+  })
 })
