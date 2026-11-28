@@ -261,7 +261,7 @@ describe('the player\'s own stops (vias)', () => {
     }
   })
 
-  it('a loop through two vias: back to the start, the vias in her order, cards between them, inside the time', async () => {
+  it('a loop through two vias: back to the start, the vias in the order given, cards between them, inside the time', async () => {
     const p = await solvePath({ ...caseReq(LOOP45), vias: [V1, V2] }, null)
     ok(p.record)
     const r = p.record
@@ -302,7 +302,7 @@ describe('the player\'s own stops (vias)', () => {
     expect(p.record.finish!.arriveMin).toBeLessThanOrEqual(45)
     expect(p.record.stops.length).toBeGreaterThan(0)
     expect(p.record.stops.length).toBeLessThan(est.record.stops.length)
-    // her own line alone runs over (2,063 m through the vias, at 1.5 times the estimate, is 50.3 min):
+    // the player's own line alone runs over (2,063 m through the vias, at 1.5 times the estimate, is 50.3 min):
     // no card fits, and the vias still stand
     const over = await solvePath(req, streets(() => 1.5))
     ok(over.record)

@@ -1,4 +1,4 @@
-// The player's own route (1.7.0): her stops (vias), passed in the order she set, with cards filling
+// The player's own route (1.7.0): their stops (vias), passed in the order given, with cards filling
 // in between them to fit the time, on plan.ts's rules: one place for each card, the cheapest one
 // in first until nothing more fits, then the line timed on real streets, the costliest card off
 // while it runs over. A via is never cut and never dwelt at. plan.ts stays Treehopper's file byte
@@ -11,7 +11,7 @@ import { estM, estMin, meters } from './geo'
 import { PLAN_VERSION } from './plan'
 import type { Candidate, Directions, ItineraryRecord, ItineraryStop, LatLon, Leg, Mode, PlanRequest, Timing } from './types'
 
-/** One of the player's own stops: a point, and what she calls it */
+/** One of the player's own stops: a point, and the name the player gives it */
 export interface Via extends LatLon {
   label?: string | null
 }

@@ -5,7 +5,7 @@
 // 1.7.0 adds, each only when a request asks for it (a request with none plans as 1.6.2 did):
 // - modes: run (the walk's streets at MODES.run's pace) and transit (the host's TransitRouter);
 // - a time rule (when: leave now, leave at, arrive by), solved to the record's clock;
-// - the player's own stops (vias), passed in her order, cards filling in between (vias.ts).
+// - the player's own stops (vias), passed in the player's order, cards filling in between (vias.ts).
 import { MODES, estMin, meters, reachM } from './geo'
 import { planItinerary } from './plan'
 import type { Candidate, Directions, ItineraryRecord, LatLon, Leg, Mode, PlanRequest, TimedWalk } from './types'
@@ -24,7 +24,7 @@ export interface PathPlan {
   record: PlanRecord
   geometry: [number, number][] // [lon, lat], from the start through every stop to the end
   timingError: string | null   // why the street timing failed and the estimate stands; the caller logs it
-  /** 1.7.0, with vias only: where the line passes each of the player's stops, in her order */
+  /** 1.7.0, with vias only: where the line passes each of the player's stops, in the order given */
   vias?: ViaPass[]
   /** 1.7.0, in transit mode only: the way the router found for each leg of the line (start to the
    *  first point, on to the end; vias count as points), null for a leg between two points at the

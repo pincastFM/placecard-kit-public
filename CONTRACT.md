@@ -241,10 +241,12 @@ What each version added:
   - A registry card with its own `url` (http or https) opens that page, in a new tab, and its button reads "Open in" and the app's name. With no `url` it opens Placecard's card page. A set's own `action` still wins.
   - The Studio foot always prints the app's name and site, drops the site's `https://`, and links the name to the app on an open card.
 - **1.6.1:** the table's head says "1 Card" at one card, where it said "1 Cards" (`labels.card`; an app that sets `labels.cards` alone keeps its word). No face changes.
+- **1.6.2:** the moderation parts' buttons take their own type again: Report, Hide, Restore and Retry at .8125em and weight 600, the sheet's and the queue's buttons at .875em, all in `--tt-mod-font-label`. A tab not chosen and a switch at Off read `--tt-mod-ink-2`, and a tab sits on the tabs' rule. Retry in a failure line takes the line's own size. `css/moderation.css` only. No face changes.
 - **1.7.0:** routing.
   - Two more modes, `run` (the walk's streets at 160 m a minute) and `transit` (the app's `TransitRouter`); never a car. `walk` is still the default.
   - A path's time rule, `when`: leave now, leave at, arrive by. Its solved start is the record's `clock`, so a path may now have one. A rule that cannot stand throws a `WhenError`, `code` `passed` or `unmet`. An arrive by with an open end is over by its time, the last stop's minutes included.
-  - The player's own stops, `vias`, in her order, with cards filling in between; the plan's `vias` says where the line passes each.
+  - The player's own stops, `vias`, in the player's order, with cards filling in between; the plan's `vias` says where the line passes each.
   - Transit: `modes.planning.transit` (or `solvePath`'s `{ transit }`), and pure helpers for an OpenTripPlanner 2.x server: `buildOtpPlanQuery`, `otpPlanToLegs`, `decodePolyline`. The kit still fetches nothing. When the rides run faster than walking and leave time, the plan is picked again at their pace (up to three more lines timed).
   - A request that names none of these plans as 1.6.2 did, and every golden is as it was.
-- **1.6.2:** the moderation parts' buttons take their own type again: Report, Hide, Restore and Retry at .8125em and weight 600, the sheet's and the queue's buttons at .875em, all in `--tt-mod-font-label`. A tab not chosen and a switch at Off read `--tt-mod-ink-2`, and a tab sits on the tabs' rule. Retry in a failure line takes the line's own size. `css/moderation.css` only. No face changes.
+  - `Mode` has two more members, so a host's exhaustive `Record<Mode, ...>` fails its type check until it adds `run` and `transit`. Nothing changes at run time.
+  - A 1.6.2 validator rejects a record whose mode is `run` or `transit`, so an app that validates other apps' records moves to 1.7.0 before any app writes those modes.
