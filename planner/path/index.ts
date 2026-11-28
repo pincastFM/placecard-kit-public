@@ -69,6 +69,10 @@ export interface PathOptions {
  * the via solver. Each throws an Error naming the field when it cannot be read. An arrive by the
  * plan cannot make (its start would come before now) throws a WhenError, code 'unmet', with the
  * earliest arrival leaving now when it was found (resolveWhen's 'passed' is the other code).
+ * An open end (no vias) ends at its last stop, so an arrive by counts that stop's minutes too: the
+ * walk is over by the time, and the earliest arrival is when it is over. Transit picks its cards at
+ * the walk's pace, then, when the rides ran faster and time is left, picks again at their pace and
+ * keeps that plan when the router's times fit (refill, at most REFILL_ROUNDS lines more).
  */
 export async function solvePath(req: PathRequest, directions: NamedDirections | Directions | null, opts: PathOptions = {}): Promise<PathPlan> {
   const mode: Mode = req.mode == null ? 'walk' : req.mode
@@ -77,54 +81,102 @@ export async function solvePath(req: PathRequest, directions: NamedDirections | 
   const when = req.when == null ? null : resolveWhen(req.when, req.minutes)
   const transitRouter = mode === 'transit' && opts && opts.transit ? opts.transit : null
   if (transitRouter && typeof transitRouter !== 'function') throw new Error('opts.transit: a TransitRouter function')
+  // an open end with no vias ends at its last stop, whose minutes count: an arrive by is over by then
+  const openEnd = !!req.end && req.end.kind === 'open' && !vias.length
+  const noDwell = new Set(vias.map((v) => v.at))
 
   // The street timing for the mode: walk and bike, the adapter as given (1.6.2's); run, the walk's
   // streets at the running pace; transit, the router, leg by leg
-  let timer: ReturnType<typeof transitTimer> | null = null
+  const newTimer = () => transitTimer(transitRouter as TransitRouter, when, req.dwellMin, noDwell, openEnd)
+  let timer: Timer | null = null
   let base: NamedDirections | Directions | null = directions
   if (mode === 'run') base = directions ? runOnWalk(directions) : null
   if (mode === 'transit') {
-    timer = transitRouter ? transitTimer(transitRouter, when, req.dwellMin, new Set(vias.map((v) => v.at))) : null
+    timer = transitRouter ? newTimer() : null
     base = timer ? timer.directions : null
   }
 
-  let named = 'mapbox' as 'mapbox' | 'route' // set inside the wrapper
-  let timingError: string | null = null
+  // a request that names nothing new goes to planItinerary as it came
+  const asked: PlanRequest = when ? { ...req, mode, minutes: when.minutes } : mode === req.mode ? req : { ...req, mode }
+  let line = await planLine(asked, vias, base, timer)
+  // transit: the cards were picked at the walk's pace; when the rides ran faster and left time, the
+  // plan is picked again at their pace (refill)
+  if (timer && asked.minutes !== null && line.rides && asked.minutes - line.record.totals.totalMin >= asked.dwellMin) {
+    line = await refill(line, asked, vias, when, newTimer)
+  }
+  const { record, geometry, passes, rides, named, timingError } = line
+
+  const placed = new Set(record.stops.map((s) => s.card))
+  const v2 = upgradeV1(record, { dwellMin: req.dwellMin, leftOver: leftOverOf(asked, placed, reachOf(line, vias)) })
+  if (v2.totals.timing === 'mapbox' && named === 'route') v2.totals.timing = 'route'
+  if (when) {
+    // the start: the first ride's (transit), else the rule's, or for an arrive by, its time less the
+    // minutes to the line's end (the end's arrival; an open end's, its last stop's arrival and minutes)
+    const lastStop = v2.stops[v2.stops.length - 1]
+    const endMin = v2.finish ? v2.finish.arriveMin : lastStop ? lastStop.arriveMin + lastStop.dwellMin : 0
+    const startMs = rides ? rides.startMs : when.kind === 'arriveBy' ? (when.deadlineMs as number) - Math.ceil(endMin) * 60000 : when.startMs
+    // an arrive by whose start comes before now (on the clock's whole minutes) cannot be made
+    if (when.kind === 'arriveBy' && Math.floor(startMs / 60000) < Math.floor(when.nowMs / 60000)) {
+      const earliest = rides && transitRouter
+        ? await leaveNowEnd(transitRouter, when, req.dwellMin, noDwell, rides.points, openEnd)
+        : when.nowMs + endMin * 60000
+      throw unmetError(when, earliest)
+    }
+    v2.clock = clockAt(startMs, when.tz)
+  }
+  const out: PathPlan = { record: v2, geometry, timingError: v2.totals.timing === 'estimate' ? timingError : null }
+  if (passes) out.vias = passes
+  if (mode === 'transit') out.transit = rides ? rides.trips : null
+  return out
+}
+
+type Timer = ReturnType<typeof transitTimer>
+
+// One line planned and timed: the record (v1), its line and points, and in transit mode the rides
+// it was timed on
+interface Line {
+  record: ItineraryRecord
+  geometry: [number, number][]
+  passes: ViaPass[] | null
+  points: LatLon[]
+  rides: TransitChain | null
+  reach: PlanRequest            // whose reach sorts the cards left over: the request, or a refill's at the rides' pace
+  named: 'mapbox' | 'route'
+  timingError: string | null
+}
+
+// plan.ts (or the via solver) on this request, with the adapter wrapped: the record names the
+// adapter's timing ('route' when it says so), and a failed timing comes back as timingError
+async function planLine(asked: PlanRequest, vias: ViaPoint[], base: NamedDirections | Directions | null, timer: Timer | null): Promise<Line> {
+  const seen = { named: 'mapbox' as 'mapbox' | 'route', timingError: null as string | null } // set inside the wrapper
   const wrapped: Directions | null = base
     ? async (points, m) => {
       try {
         // plan.ts passes the request's mode: walk or bike is the street mode, and run and transit have their own adapters
-        const walk = (await base!(points, m as StreetMode)) as NamedWalk
-        if (walk && walk.timing === 'route') named = 'route'
+        const walk = (await base(points, m as StreetMode)) as NamedWalk
+        if (walk && walk.timing === 'route') seen.named = 'route'
         return walk
       } catch (error: any) {
-        timingError = String(error?.message || error)
+        seen.timingError = String(error?.message || error)
         throw error
       }
     }
     : null
 
-  // a request that names nothing new goes to planItinerary as it came
-  const asked: PlanRequest = when ? { ...req, mode, minutes: when.minutes } : mode === req.mode ? req : { ...req, mode }
   let record: ItineraryRecord
   let geometry: [number, number][]
   let passes: ViaPass[] | null = null
   let points: LatLon[]
-  let inReachOf: (c: Candidate) => boolean
   if (vias.length) {
     const v = await planVias(asked, vias, wrapped)
     record = v.record
     geometry = v.geometry
     passes = v.passes
     points = v.points
-    if (v.timingError && timingError === null) timingError = v.timingError
-    const { anchors } = viaAnchors(asked, vias)
-    inReachOf = (c) => viaInReach(c, anchors, asked.minutes, asked.mode, asked.dwellMin)
+    if (v.timingError && seen.timingError === null) seen.timingError = v.timingError
   } else {
     ({ record, geometry } = await planItinerary(asked, wrapped))
     points = [record.start, ...record.stops.map((s) => s.place), ...(record.end.kind !== 'open' && record.end.at ? [record.end.at] : [])]
-    const endAt = record.end.at
-    inReachOf = (c) => inReach(c, asked, endAt)
   }
 
   // transit: the rides of the line the record ended on (the last timing, when it timed that line).
@@ -146,30 +198,62 @@ export async function solvePath(req: PathRequest, directions: NamedDirections | 
       if (earlier) { rides = earlier; record = retime(record, earlier.legs, asked.dwellMin) }
     }
   }
-
-  const placed = new Set(record.stops.map((s) => s.card))
-  const v2 = upgradeV1(record, { dwellMin: req.dwellMin, leftOver: leftOverOf(asked, placed, inReachOf) })
-  if (v2.totals.timing === 'mapbox' && named === 'route') v2.totals.timing = 'route'
-  if (when) {
-    // the start: the first ride's (transit), else the rule's, or for an arrive by, its time less the
-    // minutes to the line's end (the end's arrival; an open end's, its last stop's)
-    const lastStop = v2.stops[v2.stops.length - 1]
-    const endMin = v2.finish ? v2.finish.arriveMin : lastStop ? lastStop.arriveMin : 0
-    const startMs = rides ? rides.startMs : when.kind === 'arriveBy' ? (when.deadlineMs as number) - Math.ceil(endMin) * 60000 : when.startMs
-    // an arrive by whose start comes before now (on the clock's whole minutes) cannot be made
-    if (when.kind === 'arriveBy' && Math.floor(startMs / 60000) < Math.floor(when.nowMs / 60000)) {
-      const earliest = rides && transitRouter
-        ? await leaveNowEnd(transitRouter, when, req.dwellMin, new Set(vias.map((v) => v.at)), rides.points)
-        : when.nowMs + endMin * 60000
-      throw unmetError(when, earliest)
-    }
-    v2.clock = clockAt(startMs, when.tz)
-  }
-  const out: PathPlan = { record: v2, geometry, timingError: v2.totals.timing === 'estimate' ? timingError : null }
-  if (passes) out.vias = passes
-  if (mode === 'transit') out.transit = rides ? rides.trips : null
-  return out
+  return { record, geometry, passes, points, rides, reach: asked, named: seen.named, timingError: seen.timingError }
 }
+
+// Transit refills at most this many times a plan; each round times one line
+const REFILL_ROUNDS = 3
+// A line whose rides take this share of the walk's estimate or more is not picked again
+const REFILL_RATIO = 0.9
+
+// Transit picks its cards at the walk's pace (MODES.transit), so rides faster than walking leave
+// time unused: a far destination fits no card at all. Each round reads how the rides ran against the
+// walk's estimate on the line timed last (r, their minutes over the estimate's), picks again on the
+// estimate with the time and each stop's minutes over r (the cards that fit at the rides' pace),
+// and times those cards once, uncut, in the order the pick put them in (the same greedy order: the
+// pick's cards are a subset of its pool). It keeps a line only when the router timed it, it fits
+// the time, every card picked is on it, an arrive by still leaves after now, and it has more stops.
+async function refill(first: Line, asked: PlanRequest, vias: ViaPoint[], when: ResolvedWhen | null, newTimer: () => Timer): Promise<Line> {
+  const T = asked.minutes as number
+  const wanted = asked.wanted ?? new Set(asked.candidates.map((c) => c.card)).size
+  let best = first
+  let chain: TransitChain | null = first.rides
+  for (let round = 1; round <= REFILL_ROUNDS && chain; round++) {
+    if (T - best.record.totals.totalMin < asked.dwellMin) break
+    const pts: LatLon[] = chain.points
+    const est = sumOf(pts.slice(1).map((p, i) => estMin(meters(pts[i], p), 'transit')))
+    const rode = sumOf(chain.legs.map((l) => l.min))
+    if (!(est > 0) || !(rode / est < REFILL_RATIO)) break
+    const r = Math.max(rode / est, 0.01)
+    const scaled: PlanRequest = { ...asked, minutes: T / r, dwellMin: asked.dwellMin / r }
+    const pick = vias.length ? (await planVias(scaled, vias, null)).record : (await planItinerary(scaled, null)).record
+    if (pick.stops.length <= best.record.stops.length) break
+    const cards = new Set<string>()
+    const picked = asked.candidates.filter((c) => pick.stops.some((s) => s.card === c.card && s.place === c.place) && !cards.has(c.card) && !!cards.add(c.card))
+    const timer = newTimer()
+    const line = await planLine({ ...asked, candidates: picked, minutes: null, wanted }, vias, timer.directions, timer)
+    chain = line.rides
+    if (!line.rides || line.record.totals.timing === 'estimate') break
+    const late = !!when && when.kind === 'arriveBy' && Math.floor(line.rides.startMs / 60000) < Math.floor(when.nowMs / 60000)
+    if (line.record.totals.totalMin <= T && line.record.stops.length === picked.length && !late && line.record.stops.length > best.record.stops.length) {
+      best = { ...line, record: { ...line.record, minutes: T }, reach: scaled }
+    }
+  }
+  return best
+}
+
+// The reach that sorts a line's left-over cards (out of reach, or no time left)
+function reachOf(line: Line, vias: ViaPoint[]): (c: Candidate) => boolean {
+  const q = line.reach
+  if (vias.length) {
+    const { anchors } = viaAnchors(q, vias)
+    return (c) => viaInReach(c, anchors, q.minutes, q.mode, q.dwellMin)
+  }
+  const endAt = line.record.end.at
+  return (c) => inReach(c, q, endAt)
+}
+
+const sumOf = (xs: number[]) => xs.reduce((a, b) => a + b, 0)
 
 // Run: the adapter's walking streets, each leg's meters at the running pace
 function runOnWalk(directions: NamedDirections | Directions): NamedDirections {
@@ -204,17 +288,20 @@ function earlierChain(chains: TransitChain[], points: LatLon[], r: ItineraryReco
   return null
 }
 
-// Leaving now, when the line through these points reaches its end by transit; null when the router
-// finds no way (for an arrive by that cannot be made: what a host can offer instead)
-async function leaveNowEnd(router: TransitRouter, when: ResolvedWhen, dwellMin: number, noDwell: Set<LatLon>, points: LatLon[]): Promise<number | null> {
+// Leaving now, when the line through these points reaches its end by transit (an open end's: its
+// last stop's minutes up, so the walk is over); null when the router finds no way (for an arrive by
+// that cannot be made: what a host can offer instead)
+async function leaveNowEnd(router: TransitRouter, when: ResolvedWhen, dwellMin: number, noDwell: Set<LatLon>, points: LatLon[], openEnd: boolean): Promise<number | null> {
   const now: ResolvedWhen = { kind: 'now', tz: when.tz, nowMs: when.nowMs, startMs: when.nowMs, deadlineMs: null, minutes: null }
-  const timer = transitTimer(router, now, dwellMin, noDwell)
+  const timer = transitTimer(router, now, dwellMin, noDwell, openEnd)
   try {
     await timer.directions(points)
   } catch {
     return null
   }
-  return timer.state.last ? timer.state.last.endMs : null
+  const n = points.length - 1
+  const lastDwell = openEnd && n > 0 && !noDwell.has(points[n]) ? dwellMin * 60000 : 0
+  return timer.state.last ? timer.state.last.endMs + lastDwell : null
 }
 
 const round1 = (x: number) => Math.round(x * 10) / 10

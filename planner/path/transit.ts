@@ -282,9 +282,11 @@ const hms = (ms: number, tz: string) => {
  * are up, and the first ride's own start is the line's. Arrive by: the last leg arrives by the time,
  * and each one before it by the time the next one leaves, less the stop's minutes. A leg's minutes
  * include the wait for its ride. noDwell: the points that take no minutes (the player's vias).
+ * openEnd: the line ends at its last stop (an open end, no vias), so an arrive by holds the walk to be
+ * over by the time: the last leg arrives by the time less that stop's minutes (endMs stays its arrival).
  * Throws when it has no time rule or a leg has no way, and the estimate stands.
  */
-export function transitTimer(router: TransitRouter, when: ResolvedWhen | null, dwellMin: number, noDwell: Set<LatLon>) {
+export function transitTimer(router: TransitRouter, when: ResolvedWhen | null, dwellMin: number, noDwell: Set<LatLon>, openEnd = false) {
   // last: the line timed last; chains: every line timed, in order (plan.ts may keep an earlier one's stops)
   const state: { last: TransitChain | null; chains: TransitChain[] } = { last: null, chains: [] }
   const directions = async (points: LatLon[]): Promise<TimedWalk & { timing: 'route' }> => {
@@ -329,7 +331,7 @@ export function transitTimer(router: TransitRouter, when: ResolvedWhen | null, d
       }
       endMs = ready
     } else {
-      let by = when.deadlineMs as number
+      let by = (when.deadlineMs as number) - (openEnd && n > 0 && !noDwell.has(points[n]) ? dwellMin * 60000 : 0)
       let last = true
       endMs = by
       for (let i = n - 1; i >= 0; i--) {

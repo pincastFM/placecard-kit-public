@@ -9,7 +9,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { solvePath } from '../path/index'
-import { MODES, meters } from '../path/geo'
+import { MODES, estMin, meters } from '../path/geo'
 import { toV1, upgradeV1, validateRecord } from '../record'
 import { OTP_PLAN_QUERY, buildOtpPlanQuery, decodePolyline, otpPlanToLegs } from '../path/transit'
 import type { TransitItinerary, TransitRequest } from '../path/transit'
@@ -130,12 +130,15 @@ describe('the time rule: leave now, leave at, arrive by', () => {
     ok(p.record)
   })
 
-  it('arrive by, untimed: the minutes left before it are the time allowed; an open end arrives at its last stop', async () => {
+  it('arrive by, untimed: the minutes left before it are the time allowed; an open end is over by then, its last stop\'s minutes too', async () => {
     const p = await solvePath({ ...caseReq(OPEN30), minutes: null, when: { kind: 'arriveBy', tz: NY, at: 9 * 60 + 25, now: NOW } }, null)
     expect(p.record.minutes).toBe(25)
     expect(p.record.totals.totalMin).toBeLessThanOrEqual(25)
     const last = p.record.stops[p.record.stops.length - 1]
-    expect(p.record.clock).toEqual({ tz: NY, date: '2026-11-28', startAt: 9 * 60 + 25 - Math.ceil(last.arriveMin) })
+    expect(last.dwellMin).toBe(1)
+    expect(p.record.clock).toEqual({ tz: NY, date: '2026-11-28', startAt: 9 * 60 + 25 - Math.ceil(last.arriveMin + last.dwellMin) })
+    // exactly the stop's minutes earlier than an arrival at the last stop
+    expect(p.record.clock!.startAt).toBe(9 * 60 + 25 - Math.ceil(last.arriveMin) - last.dwellMin)
     ok(p.record)
   })
 
@@ -188,7 +191,7 @@ describe('the time rule: leave now, leave at, arrive by', () => {
     const p = await solvePath({ ...caseReq(OPEN30), when: { kind: 'arriveBy', tz: NY, at: 30, now: at2330 } }, null)
     ok(p.record)
     const last = p.record.stops[p.record.stops.length - 1]
-    expect(p.record.clock).toEqual({ tz: NY, date: '2026-11-28', startAt: 30 - Math.ceil(last.arriveMin) })
+    expect(p.record.clock).toEqual({ tz: NY, date: '2026-11-28', startAt: 30 - Math.ceil(last.arriveMin + last.dwellMin) })
     const at2350 = epochOf('2026-11-27', 23 * 60 + 50, NY)
     const leave = await solvePath({ ...caseReq(OPEN30), when: { kind: 'leaveAt', tz: NY, at: 15, now: at2350 } }, null)
     expect(leave.record.clock).toEqual({ tz: NY, date: '2026-11-28', startAt: 15 })
@@ -427,10 +430,10 @@ describe('OpenTripPlanner 2.x: the query the kit builds, the answer it reads', (
 // 80 m a minute; further, two minutes' walk to the line, then the straight line times 1.3 at mPerMin.
 // Leaving: the next ride after the walk; arriving by: the last ride that makes it. Each answer
 // carries a worse way too, so the pick is tested.
-function cityLine(log: TransitRequest[], mPerMin = 300) {
+function cityLine(log: TransitRequest[], mPerMin = 300, found?: Map<TransitItinerary, TransitRequest>) {
   const walk = 2 * 60000
   const every = 10 * 60000
-  return async (req: TransitRequest): Promise<TransitItinerary[]> => {
+  const router = async (req: TransitRequest): Promise<TransitItinerary[]> => {
     log.push(req)
     const m = meters(req.from, req.to) * 1.3
     const t = Date.parse(`${req.date}T${req.time}Z`)
@@ -451,6 +454,8 @@ function cityLine(log: TransitRequest[], mPerMin = 300) {
     const board = Math.floor((t - ride) / every) * every
     return [way(board - every), way(board)]
   }
+  // found: each way the router gave, to the request it answered
+  return found ? async (req: TransitRequest) => { const out = await router(req); out.forEach((x) => found.set(x, req)); return out } : router
 }
 const asked = (q: TransitRequest) => Date.parse(`${q.date}T${q.time}Z`)
 const toSecond = (ms: number) => Math.floor(ms / 1000) * 1000 // a request names its time to the second
@@ -476,15 +481,16 @@ function rideRouter(slow: (q: TransitRequest, arrive: number) => boolean, failFr
 describe('transit through solvePath: the host\'s router, leg by leg', () => {
   it('leave at: each leg leaves when the one before arrives and the stop\'s minute is up; the record runs on the rides\' times', async () => {
     const log: TransitRequest[] = []
+    const found = new Map<TransitItinerary, TransitRequest>()
     const base = caseReq(DEST40)
-    const p = await solvePath({ ...base, mode: 'transit', when: { kind: 'leaveAt', tz: 'UTC', date: '2026-11-28', at: 600, now: UTC9 } }, null, { transit: cityLine(log) })
+    const p = await solvePath({ ...base, mode: 'transit', when: { kind: 'leaveAt', tz: 'UTC', date: '2026-11-28', at: 600, now: UTC9 } }, null, { transit: cityLine(log, 300, found) })
     ok(p.record)
     const r = p.record
     expect([r.mode, r.totals.timing]).toEqual(['transit', 'route'])
     expect(r.stops.length).toBeGreaterThan(0)
     const rides = p.transit!
     expect(rides).toHaveLength(r.stops.length + 1)
-    const last = log.slice(-rides.length)
+    const last = rides.map((t) => found.get(t!)!) // a refill may time a line after this one and not keep it
     expect(last[0]).toMatchObject({ date: '2026-11-28', time: '10:00:00', arriveBy: false, tz: 'UTC', from: START })
     for (let i = 1; i < last.length; i++) expect(asked(last[i])).toBe(toSecond(rides[i - 1]!.endTime + base.dwellMin * 60000))
     const start = startOf(r.clock!)
@@ -495,14 +501,15 @@ describe('transit through solvePath: the host\'s router, leg by leg', () => {
 
   it('arrive by: asked from the end back, each leg arriving by the time the next one leaves, less the stop\'s minute', async () => {
     const log: TransitRequest[] = []
+    const found = new Map<TransitItinerary, TransitRequest>()
     const base = caseReq(DEST40)
     const noon = Date.UTC(2026, 10, 28, 12, 0)
-    const p = await solvePath({ ...base, mode: 'transit', when: { kind: 'arriveBy', tz: 'UTC', date: '2026-11-28', at: 720, now: Date.UTC(2026, 10, 28, 9, 0) } }, null, { transit: cityLine(log) })
+    const p = await solvePath({ ...base, mode: 'transit', when: { kind: 'arriveBy', tz: 'UTC', date: '2026-11-28', at: 720, now: Date.UTC(2026, 10, 28, 9, 0) } }, null, { transit: cityLine(log, 300, found) })
     ok(p.record)
     const r = p.record
     const rides = p.transit!
-    const last = log.slice(-rides.length)
-    expect(last.every((q) => q.arriveBy)).toBe(true)
+    const last = rides.map((t) => found.get(t!)!).reverse() // asked from the end back
+    expect(log.every((q) => q.arriveBy)).toBe(true)
     expect(last[0]).toMatchObject({ time: '12:00:00', to: DEST })
     const start = startOf(r.clock!)
     expect(start).toBe(toMinute(rides[0]!.startTime))
@@ -525,7 +532,8 @@ describe('transit through solvePath: the host\'s router, leg by leg', () => {
       expect(start).toBe(toMinute(rides[0]!.startTime))
       const lastStop = r.stops[r.stops.length - 1]
       expect(Math.abs(start + lastStop.arriveMin * 60000 - rides.at(-1)!.endTime)).toBeLessThanOrEqual(3000)
-      expect(start + lastStop.arriveMin * 60000).toBeLessThanOrEqual(deadline + 3000)
+      expect(lastStop.dwellMin).toBe(base.dwellMin)
+      expect(start + (lastStop.arriveMin + lastStop.dwellMin) * 60000, `${minutes}: over by then`).toBeLessThanOrEqual(deadline + 3000)
       r.stops.slice(0, -1).forEach((s, i) => expect(Math.abs(start + (s.arriveMin + base.dwellMin) * 60000 - rides[i + 1]!.startTime), `${minutes}: stop ${i + 1}`).toBeLessThanOrEqual(3000))
     }
   })
@@ -589,6 +597,7 @@ describe('transit through solvePath: the host\'s router, leg by leg', () => {
   const B = { card: 'B', place: { id: 'b', lat: START.lat + 0.002, lon: START.lon } }
   const C = { card: 'C', place: { id: 'c', lat: START.lat + 0.003, lon: START.lon } }
   const lineReq = (when: any) => ({ ...caseReq(OPEN30), mode: 'transit', minutes: 30, dwellMin: 5, candidates: [A, B, C], when })
+  const DWELL5 = 5 * 60000 // lineReq's minutes at a stop
   const at = (h: number, m = 0) => Date.UTC(2026, 10, 28, h, m)
   const lateSlow = (_q: TransitRequest, arrive: number) => arrive > at(11, 30) // the reviewer's: arriving after 11:30, 100 minutes
   const toCSlow = (q: TransitRequest) => q.to.lat === C.place.lat
@@ -603,14 +612,17 @@ describe('transit through solvePath: the host\'s router, leg by leg', () => {
     expect(r.totals.totalMin).toBeLessThanOrEqual(30)
     expect(r.stops.map((s) => s.leg.min)).toEqual([3, 3])
     const rides = p.transit!
-    expect(rides.map((t) => [t!.startTime, t!.endTime])).toEqual([[at(10, 4), at(10, 7)], [at(10, 12), at(10, 15)]])
-    expect(r.clock).toEqual({ tz: 'UTC', date: '2026-11-28', startAt: 10 * 60 + 4 })
+    // the walk is over by 12:00, so the line is asked to reach its last stop by 11:55: every ride
+    // exactly the last stop's 5 minutes earlier than arriving there at 12:00 would make it
+    expect(rides.map((t) => [t!.startTime, t!.endTime])).toEqual([[at(10, 4), at(10, 7)], [at(10, 12), at(10, 15)]].map(([s, e]) => [s - DWELL5, e - DWELL5]))
+    expect(r.clock).toEqual({ tz: 'UTC', date: '2026-11-28', startAt: 10 * 60 + 4 - 5 })
     r.stops.forEach((s, i) => expect(startOf(r.clock!) + s.arriveMin * 60000).toBe(rides[i]!.endTime))
   })
 
   it('the router failing when asked again: the record stands on the timing its stops came from, with its rides and its start', async () => {
     const cases = [
-      { name: 'arrive by', when: { kind: 'arriveBy', tz: 'UTC', date: '2026-11-28', at: 720, now: UTC9 }, slow: lateSlow, rides: [[at(10, 4), at(10, 7)], [at(10, 12), at(10, 15)]], startAt: 604 },
+      // arrive by 12:00: the last stop's 5 minutes are up by then, so each ride comes 5 minutes earlier
+      { name: 'arrive by', when: { kind: 'arriveBy', tz: 'UTC', date: '2026-11-28', at: 720, now: UTC9 }, slow: lateSlow, rides: [[at(10, 4) - DWELL5, at(10, 7) - DWELL5], [at(10, 12) - DWELL5, at(10, 15) - DWELL5]], startAt: 604 - 5 },
       // leave at 10:00: each ride leaves at the next :05, so the line waits five minutes at its start
       { name: 'leave at', when: { kind: 'leaveAt', tz: 'UTC', date: '2026-11-28', at: 600, now: UTC9 }, slow: toCSlow, rides: [[at(10, 5), at(10, 8)], [at(10, 15), at(10, 18)]], startAt: 605 },
     ]
@@ -630,6 +642,117 @@ describe('transit through solvePath: the host\'s router, leg by leg', () => {
       r.stops.forEach((s, i) => expect(startOf(r.clock!) + s.arriveMin * 60000, `${c.name}: stop ${i + 1}`).toBe(rides[i]!.endTime))
       expect(strip(r)).toEqual(strip(full.record)) // as when asking again worked
       expect(p.transit).toEqual(full.transit)
+    }
+  })
+  // Review of 83f7ef1's end to end, case 2: an open end's arrive by is over by then, so leaving now
+  // its earliest arrival is when the last stop's minutes are up
+  it('open, arrive by, no ride after now: the line is asked to reach its last stop the stop\'s minutes early, and the earliest arrival is when the walk is over', async () => {
+    const byAsked: number[] = []
+    // arriving by: a 3-minute way that leaves at 10:50 (before now, 11:00); leaving: 10 minutes' wait, 65 minutes' ride
+    const router = async (q: TransitRequest) => {
+      if (q.arriveBy) { byAsked.push(asked(q)); return [way(q, at(10, 50), at(10, 53))] }
+      return [way(q, asked(q) + 10 * 60000, asked(q) + 75 * 60000)]
+    }
+    const req = { ...lineReq({ kind: 'arriveBy', tz: 'UTC', date: '2026-11-28', at: 720, now: at(11) }), candidates: [A] }
+    const err = await solvePath(req, null, { transit: router }).catch((e) => e)
+    expect(byAsked[0]).toBe(at(11, 55)) // 12:00 less A's 5 minutes
+    expect(err).toBeInstanceOf(WhenError)
+    expect(err.code).toBe('unmet')
+    // leaving now, A at 12:15, and its 5 minutes up at 12:20
+    expect(err.earliestArrival).toEqual({ ms: at(12, 20), tz: 'UTC', date: '2026-11-28', at: 12 * 60 + 20 })
+    expect(err.message).toBe('when: arrive by 2026-11-28 12:00 cannot be met: leaving now, the plan arrives 2026-11-28 12:20')
+  })
+
+  // Review of 83f7ef1's end to end, case 5: transit picks its cards at the walk's pace, so a far
+  // destination fits none; the refill picks again at the rides' pace. Three cards on the straight
+  // line from Union Square to the Financial District, 200 m apart (each leg between them a walk).
+  // a point `along` meters from the start toward FAR, and `across` meters to its left (east of the line)
+  const aside = (along: number, across = 0) => {
+    const d = meters(START, FAR)
+    const kx = meters({ lat: START.lat, lon: 0 }, { lat: START.lat, lon: 1 })
+    const ky = meters({ lat: 0, lon: 0 }, { lat: 1, lon: 0 })
+    const north = ((FAR.lat - START.lat) * ky) / d
+    const east = ((FAR.lon - START.lon) * kx) / d
+    return { lat: START.lat + (north * along - east * across) / ky, lon: START.lon + (east * along + north * across) / kx }
+  }
+  const N = [200, 400, 600].map((m, i) => ({ card: `N${i + 1}`, place: { id: `n${i + 1}`, ...aside(m) } }))
+  // some 3 km east of the start: out of the walk's reach, in the rides' (and still no time for it)
+  const X = { card: 'X', place: { id: 'x', ...aside(0, -3000) } }
+  const farReq = (when: any, extra: any = {}) => ({
+    ...caseReq(DEST40), end: { kind: 'destination', at: FAR, name: 'Wall Street' }, mode: 'transit', minutes: 60, dwellMin: 5, candidates: N, when, ...extra,
+  })
+  const LEAVE10 = { kind: 'leaveAt', tz: 'UTC', date: '2026-11-28', at: 600, now: UTC9 }
+  const BY12 = { kind: 'arriveBy', tz: 'UTC', date: '2026-11-28', at: 720, now: UTC9 }
+  const pace = (factor: number, fast?: (q: TransitRequest) => number | null) => {
+    let n = 0
+    const router = async (q: TransitRequest) => {
+      n++
+      const min = (fast && fast(q)) ?? factor * estMin(meters(q.from, q.to), 'walk')
+      const t = asked(q)
+      return [q.arriveBy ? way(q, t - min * 60000, t) : way(q, t, t + min * 60000)]
+    }
+    return Object.assign(router, { calls: () => n })
+  }
+
+  it('a far destination: the walk\'s estimate fits no card, the rides leave time, and the refill places the cards inside it', async () => {
+    expect(estMin(meters(START, FAR), 'walk') + 5).toBeGreaterThan(60) // the straight walk and one stop's minutes: over the hour
+    const walk = (await solvePath(farReq(LEAVE10, { mode: 'walk', candidates: [...N, X] }), null)).record
+    expect([walk.stops.length, walk.leftOver.map((x) => x.reason)]).toEqual([0, ['out of reach', 'out of reach', 'out of reach', 'out of reach']])
+    for (const when of [LEAVE10, BY12]) {
+      const log: TransitRequest[] = []
+      const p = await solvePath(farReq(when, { candidates: [...N, X] }), null, { transit: cityLine(log) })
+      ok(p.record)
+      const r = p.record
+      // the card left over is sorted at the rides' pace: in reach, with no time left for it
+      expect([r.totals.timing, r.minutes, r.stops.map((s) => s.card), r.leftOver], when.kind).toEqual(['route', 60, ['N1', 'N2', 'N3'], [{ key: 'X', kind: 'card', reason: 'no time left' }]])
+      expect(r.totals.totalMin).toBeLessThanOrEqual(60)
+      expect(log, when.kind).toHaveLength(1 + 4) // the line to the destination, then the refill's line, once
+      const rides = p.transit!
+      expect(rides).toHaveLength(4)
+      const start = startOf(r.clock!)
+      expect(start).toBe(toMinute(rides[0]!.startTime))
+      r.stops.forEach((s, i) => expect(Math.abs(start + s.arriveMin * 60000 - rides[i]!.endTime)).toBeLessThanOrEqual(3000))
+      expect(Math.abs(start + r.finish!.arriveMin * 60000 - rides[3]!.endTime)).toBeLessThanOrEqual(3000)
+      if (when.kind === 'arriveBy') {
+        expect(start).toBeGreaterThanOrEqual(UTC9)
+        expect(start + r.finish!.arriveMin * 60000).toBeLessThanOrEqual(at(12) + 3000)
+      }
+    }
+  })
+
+  it('a router no faster than walking, or under a tenth faster: no refill, and no call beyond the line\'s own', async () => {
+    // a fourth card 220 m off the line between N1 and N2: the walk is 4.6 minutes short for it, and
+    // at 0.92 of the walk's pace the pick would make room for it
+    const side = { card: 'S', place: { id: 's', ...aside(300, 220) } }
+    const req = farReq(LEAVE10, { minutes: 80, candidates: [...N, side] })
+    for (const factor of [1, 0.92]) {
+      const router = pace(factor)
+      const p = await solvePath(req, null, { transit: router })
+      ok(p.record)
+      expect([p.record.stops.map((s) => s.card), p.record.totals.timing], `${factor}`).toEqual([['N1', 'N2', 'N3'], 'route'])
+      expect(80 - p.record.totals.totalMin).toBeGreaterThanOrEqual(5) // time is left for a stop: only the pace stops the refill
+      expect(router.calls(), `${factor}`).toBe(4) // one a leg, once
+    }
+    // the same plan on rides faster than walking is picked again: calls beyond the line's own
+    const fast: TransitRequest[] = []
+    const p = await solvePath(req, null, { transit: cityLine(fast) })
+    expect(fast.length).toBeGreaterThan(4)
+    expect(p.record.stops.map((s) => s.card)).toContain('S')
+  })
+
+  it('a refill line over the time is not kept: the plan stands on the walk\'s pick and its rides', async () => {
+    // 20 minutes from the start straight to the destination; every other leg at a third of the walk's pace
+    const direct = (q: TransitRequest) => (meters(q.from, START) < 1 && meters(q.to, FAR) < 1 ? 20 : null)
+    for (const when of [LEAVE10, BY12]) {
+      const router = pace(3, direct)
+      const p = await solvePath(farReq(when), null, { transit: router })
+      ok(p.record)
+      const r = p.record
+      expect([r.stops.length, r.totals.timing, r.minutes, r.finish!.leg.min, r.totals.totalMin], when.kind).toEqual([0, 'route', 60, 20, 20])
+      expect(router.calls(), when.kind).toBe(1 + 4) // the line, then the refill's line, over the time; its pace stops a second
+      expect(p.transit!.map((t) => t!.endTime - t!.startTime)).toEqual([20 * 60000])
+      // the cards it left are sorted at the walk's pace, since the refill was not kept
+      expect(r.leftOver.map((x) => [x.key, x.reason])).toEqual(N.map((c) => [c.card, 'out of reach']))
     }
   })
 })
