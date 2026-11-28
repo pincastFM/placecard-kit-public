@@ -174,11 +174,11 @@ describe('When: the time rule row', () => {
 })
 
 describe('the unmet line', () => {
-  it('an unmet arrive by adds "Leave now, arrive" and the time; null reads Leave now; passed adds nothing', async () => {
+  it('an unmet arrive by adds "Leave now · Arrive" and the time (1.9.0\'s words); null reads Leave now; passed adds nothing', async () => {
     const line = async e => (await at({ whenError: e })).findAll('.tt-path-sum .tt-path-unmet').map(x => x.text())
     expect(await line(null)).toEqual([])
-    expect(await line({ code: 'unmet', message: '', earliestArrival: { ms: 0, tz: 'America/New_York', date: '2026-11-28', at: 880 } })).toEqual(['Leave now, arrive 2:40 PM'])
-    expect(await line({ code: 'unmet', message: '', earliestArrival: { time: '14:40' } })).toEqual(['Leave now, arrive 2:40 PM'])
+    expect(await line({ code: 'unmet', message: '', earliestArrival: { ms: 0, tz: 'America/New_York', date: '2026-11-28', at: 880 } })).toEqual(['Leave now · Arrive 2:40 PM'])
+    expect(await line({ code: 'unmet', message: '', earliestArrival: { time: '14:40' } })).toEqual(['Leave now · Arrive 2:40 PM'])
     expect(await line({ code: 'unmet', message: '', earliestArrival: null })).toEqual(['Leave now'])
     expect(await line({ code: 'passed', message: '', earliestArrival: null })).toEqual([])
   })
@@ -322,37 +322,7 @@ describe('the player\'s own stops', () => {
 })
 
 describe('Add stop', () => {
-  it('off by default; stopsEditable adds a Stops row under End, after the end slot', async () => {
-    expect(labs(await at())).not.toContain('Stops')
-    const w = await at({ stopsEditable: true }, { end: '<i class="x-end">search</i>' })
-    expect(labs(w)).toEqual(['From', 'Time', 'End', 'Stops'])
-    const p = w.find('.tt-path-p').element
-    const kids = Array.from(p.children)
-    const endSlot = kids.findIndex(e => e.classList.contains('x-end'))
-    const stopsRow = kids.findIndex(e => e.querySelector && e.querySelector('.tt-path-add'))
-    expect(stopsRow).toBe(endSlot + 1)
-    expect(chipText(w, 'Stops')).toEqual(['Add stop'])
-  })
-
-  it('Add stop opens the add slot inline with close; a second tap or close shuts it', async () => {
-    let close = null
-    const w = await at({ stopsEditable: true }, { add: (p) => { close = p.close; return h('i', { class: 'x-add' }, 'find a place') } })
-    expect(w.find('.x-add').exists()).toBe(false)
-    const chip = w.find('.tt-path-add')
-    await chip.trigger('click')
-    expect(w.find('.x-add').exists()).toBe(true)
-    expect(chip.attributes('aria-expanded')).toBe('true')
-    expect(chip.classes()).toContain('is-on')
-    close()
-    await nextTick()
-    expect(w.find('.x-add').exists()).toBe(false)
-    await chip.trigger('click')
-    await chip.trigger('click')
-    expect(w.find('.x-add').exists()).toBe(false)
-    expect(w.emitted('add-open')).toHaveLength(2)
-    expect(w.emitted('add-close')).toHaveLength(2)
-  })
-
+  // 1.9.0 moved Add stop from a Stops row under End into the stops list (path181.test.js)
   it('without stopsEditable the add slot never shows', async () => {
     const w = await at({}, { add: '<i class="x-add">x</i>' })
     expect(w.find('.x-add').exists()).toBe(false)

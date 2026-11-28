@@ -257,7 +257,7 @@ describe('the player\'s own stops (vias)', () => {
       const via = await solvePath({ ...base, end: { kind: 'open' }, vias: [{ ...DEST, label: 'Empire State Building' }] }, d())
       expect(strip(via.record), name).toEqual(strip({ ...dest.record, end: { kind: 'destination', at: DEST, name: 'Empire State Building' } }))
       expect(via.geometry).toEqual(dest.geometry)
-      expect(via.vias).toEqual([{ n: 1, at: DEST, label: 'Empire State Building', arriveMin: dest.record.finish!.arriveMin, after: dest.record.stops.length }])
+      expect(via.vias).toEqual([{ n: 1, at: DEST, label: 'Empire State Building', arriveMin: dest.record.finish!.arriveMin, after: dest.record.stops.length, leg: dest.record.finish!.leg }]) // 1.9.0: the end's leg is the finish's
     }
   })
 
@@ -289,7 +289,7 @@ describe('the player\'s own stops (vias)', () => {
     ok(p.record)
     expect(p.record.stops.length).toBe(new Set(CANDIDATES.map((c) => c.card)).size) // untimed: every card, one place each
     expect(p.record.end).toEqual({ kind: 'destination', at: { lat: V2.lat, lon: V2.lon }, name: 'Corner' })
-    expect(p.vias!.at(-1)).toEqual({ n: 2, at: { lat: V2.lat, lon: V2.lon }, label: 'Corner', arriveMin: p.record.finish!.arriveMin, after: p.record.stops.length })
+    expect(p.vias!.at(-1)).toEqual({ n: 2, at: { lat: V2.lat, lon: V2.lon }, label: 'Corner', arriveMin: p.record.finish!.arriveMin, after: p.record.stops.length, leg: p.record.finish!.leg })
   })
 
   it('timed on streets and over the time: cards come off, every via stays', async () => {

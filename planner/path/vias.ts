@@ -4,9 +4,12 @@
 // while it runs over. A via is never cut and never dwelt at. plan.ts stays Treehopper's file byte
 // for byte, so this is its own solver; a request with no vias never comes here.
 //
-// The record keeps its shape: its stops are the cards, and each leg runs through the vias between
-// a card and the one before it. With an open end the last via is the end, so the record names it
-// as a destination (its label the name). Where each via falls comes back beside the record.
+// The record keeps its shape: its stops are the cards. With an open end the last via is the end, so
+// the record names it as a destination (its label the name). Where each via falls comes back beside
+// the record. 1.9.0: each via pass carries its own leg (the way to it from the point before), and a
+// card's leg (or the finish's) runs from the point before it, a via when one is between, so the
+// cards' legs, the finish's and the passes' sum to the totals (1.8.0's card legs ran through the
+// vias). A request with no vias never comes here, so its records are unchanged.
 import { estM, estMin, meters } from './geo'
 import { PLAN_VERSION } from './plan'
 import type { Candidate, Directions, ItineraryRecord, ItineraryStop, LatLon, Leg, Mode, PlanRequest, Timing } from './types'
@@ -23,6 +26,10 @@ export interface ViaPass {
   label: string | null
   arriveMin: number // minutes from the start
   after: number     // stops placed before it; 0 when it comes straight from the start
+  /** 1.9.0: the way here from the point before it (the start, a card or a via), at the timing's
+   *  pace; the next card's (or the finish's) leg runs on from here. An open end's last via is the
+   *  end, and its leg is the finish's. Optional, so a 1.8.0 caller's own passes still type-check. */
+  leg?: Leg
 }
 
 // A via as the solver keeps it; `at` goes into every point list as itself, so a street timing can
@@ -139,7 +146,7 @@ export async function planVias(req: PlanRequest, vias: ViaPoint[], directions: D
   const stops: ItineraryStop[] = []
   const passes: ViaPass[] = []
   let arrive = 0
-  let acc: Leg = { m: 0, min: 0 } // the way since the last card (or the start), through any vias
+  let acc: Leg = { m: 0, min: 0 } // the way since the point before (the start, a card or a via)
   route.forEach((n, i) => {
     arrive += legs[i].min
     acc = { m: acc.m + legs[i].m, min: acc.min + legs[i].min }
@@ -148,7 +155,8 @@ export async function planVias(req: PlanRequest, vias: ViaPoint[], directions: D
       acc = { m: 0, min: 0 }
       arrive += dwell
     } else {
-      passes.push({ n: n.via! + 1, at: { lat: n.at.lat, lon: n.at.lon }, label: vias[n.via!].label, arriveMin: round1(arrive), after: stops.length })
+      passes.push({ n: n.via! + 1, at: { lat: n.at.lat, lon: n.at.lon }, label: vias[n.via!].label, arriveMin: round1(arrive), after: stops.length, leg: roundLeg(acc) })
+      acc = { m: 0, min: 0 }
     }
   })
   const last = legs[route.length]
@@ -156,7 +164,7 @@ export async function planVias(req: PlanRequest, vias: ViaPoint[], directions: D
   acc = { m: acc.m + last.m, min: acc.min + last.min }
   const finish = { leg: roundLeg(acc), arriveMin: round1(arrive) }
   const lastVia = vias[vias.length - 1]
-  if (req.end.kind === 'open') passes.push({ n: vias.length, at: { lat: endAt.lat, lon: endAt.lon }, label: lastVia.label, arriveMin: finish.arriveMin, after: stops.length })
+  if (req.end.kind === 'open') passes.push({ n: vias.length, at: { lat: endAt.lat, lon: endAt.lon }, label: lastVia.label, arriveMin: finish.arriveMin, after: stops.length, leg: { ...finish.leg } })
 
   const walkMin = sum(legs.map((l) => l.min))
   const wanted = req.wanted ?? new Set(req.candidates.map((c) => c.card)).size

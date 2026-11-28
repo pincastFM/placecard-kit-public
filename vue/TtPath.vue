@@ -66,16 +66,6 @@
           </div>
         </div>
         <slot name="end" :end="end" />
-        <div v-for="x in addRow" :key="x" class="tt-path-row">
-          <span class="tt-path-lab">{{ L.stops }}</span>
-          <div class="tt-path-chips" role="group" :aria-label="L.stops">
-            <button
-              class="tt-chip tt-path-add" type="button" :class="{ 'is-on': adding }"
-              :aria-pressed="adding ? 'true' : 'false'" :aria-expanded="adding ? 'true' : 'false'" @click="toggleAdd"
-            >{{ L.addStop }}</button>
-          </div>
-        </div>
-        <template v-for="x in addSlot" :key="x"><slot name="add" :close="closeAdd" /></template>
 
         <div v-if="sum" class="tt-path-sum" :class="{ 'is-busy': busy }" aria-live="polite">
           <template v-if="sum.head">
@@ -89,9 +79,10 @@
             <b>{{ sum.dist }}</b><span>{{ sum.count }}</span>
           </template>
           <span v-for="u in unmetLine" :key="u" class="tt-path-unmet">{{ u }}</span>
+          <span v-for="u in clocksLine" :key="u" class="tt-path-clocks">{{ u }}</span>
         </div>
 
-        <ol v-if="rows.length" ref="listEl" class="tt-path-stops">
+        <ol v-if="rows.length || addLi.length" ref="listEl" class="tt-path-stops">
           <template v-for="r in rows" :key="r.id">
             <li
               v-if="r.via" class="is-via" :class="{ 'is-drag': !!drag && drag.from === r.via.i }"
@@ -125,6 +116,11 @@
             <b class="tt-path-nm">{{ fin.title }}</b>
             <span v-if="fin.trip" class="tt-path-leg is-transit"><span class="tt-path-badges"><span v-for="(b, j) in fin.trip.badges" :key="j" class="tt-path-badge" :class="{ 'is-plain': !b.bg }" :style="b.bg ? { background: b.bg, color: b.fg || undefined } : undefined">{{ b.name }}</span></span><span v-for="t in fin.trip.words" :key="t" class="tt-path-ride">{{ t }}</span></span>
             <span v-else class="tt-path-leg">{{ fin.leg }}</span>
+          </li>
+          <li v-for="x in addLi" :key="x" class="tt-path-add" :class="{ 'is-on': adding }">
+            <span class="tt-path-n is-add" aria-hidden="true">+</span>
+            <slot v-if="adding" name="add" :close="closeAdd" />
+            <button v-else class="tt-path-nm" type="button" aria-expanded="false" @click="openAdd">{{ L.addStop }}</button>
           </li>
         </ol>
 
@@ -187,8 +183,8 @@
  *   device's when null: at 2:07 PM, 2:15 PM; at 2:15 PM, 2:30 PM). A time picked emits when with it.
  *   Times read on a 12-hour clock; clockFmt(minutes past midnight) gives the app's own.
  * - whenError ({ code, earliestArrival: { at } } or null, the app's answer to a time rule): with code
- *   'unmet' the summary adds "Leave now, arrive 2:40 PM" (earliestArrival's at, minutes past
- *   midnight), or "Leave now" when it is null.
+ *   'unmet' the summary adds "Leave now · Arrive 2:40 PM" (1.9.0's words; 1.8.0 read "Leave now,
+ *   arrive 2:40 PM"), from earliestArrival's at (minutes past midnight), or "Leave now" when it is null.
  * - The player's own stops: vias (the plan's ViaPass list, null by default) and stopsEditable. With
  *   vias, the list is one list with one numbering, matching the map: each via sits after the cards
  *   placed before it (its after), its row li.is-via with its label (or "Stop"), an × (emits remove,
@@ -197,15 +193,33 @@
  *   emits move { from, to }, both indexes in the order given). While a row is dragged it carries
  *   is-drag and --tt-drag-y, the pointer's offset. Card rows never drag; the app plans again and the
  *   cards fill in around the new order. An open end's last via is the end: its row is the list's
- *   last, with the finish leg, in place of the finish row. A street via row shows no leg of its own:
- *   the card after it shows the way through it. With stopsEditable, a Stops row under End holds an
- *   Add stop chip that opens the add slot inline ({ close }) and emits add-open or add-close.
+ *   last, with the finish leg, in place of the finish row. A via row shows its own leg when its pass
+ *   has one (1.9.0, below); a 1.8.0 pass has none, and the card after it shows the way through it.
+ *   stopsEditable: the Add stop row (1.9.0, below; 1.8.0 put it in a Stops row under End).
  *   The map slot's rows ({ n, kind: 'card' | 'via', at }) follow the list's numbering.
  * - Transit legs: trips (the app's trip for each leg of the line, start to the first point and on to
  *   the end, null where there is none). A leg with a trip reads its rides and its walk: a badge per
  *   ride (span.tt-path-badge, the route's short name in the route's color and text color, or
  *   is-plain with no color for the app to draw), the rides' minutes, then "walk 4 min". The
  *   summary's minutes stay the record's legs.
+ *
+ * 1.9.0, only where a 1.8.0 prop is on, so a host that passes none of them still gets 1.7.0's markup:
+ * - Add stop moved from the controls into the list. With stopsEditable, the stops list's last row
+ *   (after the finish row, above Didn't fit) is li.tt-path-add: span.tt-path-n.is-add holding "+"
+ *   in the number's place (the app draws it, a dashed square for Treehopper), then the name, a
+ *   button reading "Add stop". The button opens the add slot ({ close }) in its place (li gets
+ *   is-on; emits add-open), and close puts the button back (emits add-close); Escape closes an open
+ *   search before the panel. The list shows with only this row when the plan has no stops or there
+ *   is no plan yet, so the app turns stopsEditable on once it can plan (it knows where the player
+ *   stands). The Stops row and labels.stops are gone.
+ * - A via's own leg: a pass with leg { m, min } (the planner's, 1.9.0) shows it like a card's
+ *   ("0.1 mi · 4 min"), between the name and the ×, its minutes on the same running total, so the
+ *   list's legs add up to the summary.
+ * - The clocks line: with a time rule picked (when not Now), no whenError and a plan with stops, the
+ *   summary's second line reads "Leave 9:00 PM · Arrive 10:00 PM" (span.tt-path-clocks): the
+ *   record's clock.startAt and startAt plus totals.totalMin (the outing with its minutes at the
+ *   stops), rounded up. It reads the record only; the start is whatever the planner (or the app)
+ *   solved. The serif number stays the moving minutes.
  */
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { durLabel, fmtDist } from '../core/dayMap.js'
@@ -220,9 +234,11 @@ const LABELS = {
   by: 'By', walk: 'Walk', run: 'Run', bike: 'Bike', transit: 'Transit',
   running: 'running', biking: 'biking', byTransit: 'by transit',
   when: 'When', now: 'Now', leaveAt: 'Leave at', arriveBy: 'Arrive by', leaveTime: 'Leave {t}', arriveTime: 'Arrive by {t}',
-  unmet: 'Leave now, arrive {t}', unmetNone: 'Leave now',
-  stops: 'Stops', addStop: 'Add stop', via: 'Stop', moveStop: 'Move {name}', removeStop: 'Remove {name}',
+  unmetNone: 'Leave now',
+  addStop: 'Add stop', via: 'Stop', moveStop: 'Move {name}', removeStop: 'Remove {name}',
   walkMin: 'walk {n} min', ride: 'Ride',
+  // 1.9.0 (unmet's words changed with the clocks line; labels.stops is no longer read)
+  unmet: 'Leave now · Arrive {t}', leaveArrive: 'Leave {a} · Arrive {b}',
 }
 // The summary's word for each mode
 const MODE_WORD = { walk: 'walking', run: 'running', bike: 'biking', transit: 'byTransit' }
@@ -278,13 +294,29 @@ const finLeg = computed(() => {
   return p && p.finish && p.end && p.end.kind !== 'open' ? p.finish.leg : null
 })
 
-// Each leg's minutes on the running total, at least 1, so the shown legs add up to the summary
+// The list's entries in order before their words: the cards, each via placed after the cards before it
+// (its after), then the end. A via with no leg of its own (a 1.8.0 pass) takes no leg.
+const order = computed(() => {
+  const mids = passes.value.filter(v => v !== endVia.value)
+  const out = []
+  stops.value.forEach((s, i) => {
+    for (const v of mids) if (v.after === i) out.push({ via: v })
+    out.push({ stop: s })
+  })
+  for (const v of mids) if (v.after >= stops.value.length) out.push({ via: v })
+  return out
+})
+
+// Each leg's minutes on the running total, at least 1, so the shown legs add up to the summary; the
+// legs in the list's order (each card's, each via's own, then the finish's), one per entry, null for
+// an entry with none
 const legMin = computed(() => {
-  const legs = stops.value.map(s => s.leg).concat(finLeg.value ? [finLeg.value] : [])
+  const legs = order.value.map(e => (e.via ? (e.via.leg || null) : e.stop.leg)).concat(finLeg.value ? [finLeg.value] : [])
   const out = []
   let cum = 0, shownSum = 0
   for (const l of legs) {
-    cum += Number(l && l.min) || 0
+    if (!l) { out.push(null); continue }
+    cum += Number(l.min) || 0
     const d = Math.max(1, Math.round(cum) - shownSum)
     out.push(d)
     shownSum += d
@@ -346,7 +378,7 @@ const nextQuarter = () => toHHMM(((Math.floor(nowMin() / 15) + 1) * 15) % 1440)
 // The rows that show only when the app offers them (a v-for over one key or none, so an unset row leaves no mark)
 const byRow = computed(() => (props.modeOptions.length ? ['by'] : []))
 const whenRow = computed(() => (props.whenOptions.length ? ['when'] : []))
-const addRow = computed(() => (props.stopsEditable ? ['add'] : []))
+const addLi = computed(() => (props.stopsEditable ? ['add'] : []))
 
 // When: the chips, the picked one's time, the native picker
 const whenKind = computed(() => (props.when && props.when.kind) || 'now')
@@ -389,6 +421,18 @@ const unmetLine = computed(() => {
   return [m == null ? L.value.unmetNone : fillT(L.value.unmet, clock(m))]
 })
 
+// 1.9.0, the clocks line: with a time rule (when not Now) and no whenError, the record's start and its
+// end on the place's clock, read from the record alone: clock.startAt, and startAt plus
+// totals.totalMin (the outing, its minutes at the stops included), rounded up as an arrival is
+const clocksLine = computed(() => {
+  const p = shown.value
+  if (!p || none.value || props.whenError || whenKind.value === 'now') return []
+  const c = p.clock
+  if (!c || !Number.isFinite(c.startAt)) return []
+  const total = Number(p.totals && p.totals.totalMin) || 0
+  return [String(L.value.leaveArrive).replace('{a}', clock(c.startAt)).replace('{b}', clock(c.startAt + Math.ceil(total)))]
+})
+
 // A trip's words: a badge per ride, the rides' minutes, the walk's
 const tripOf = (t) => {
   if (!t || !Array.isArray(t.legs)) return null
@@ -419,35 +463,30 @@ const endVia = computed(() => {
 })
 
 const rows = computed(() => {
-  const mids = passes.value.filter(v => v !== endVia.value)
   const out = []
   const via = v => ({ id: `via:${v.n}`, via: { i: v.n - 1 }, at: v.at, title: v.label || L.value.via, leg: '' })
-  stops.value.forEach((s, i) => {
-    for (const v of mids) if (v.after === i) out.push(via(v))
+  order.value.forEach((e, k) => {
+    if (e.via) { out.push({ ...via(e.via), leg: e.via.leg ? legText(e.via.leg, k) : '' }); return }
+    const s = e.stop
     const c = props.cardFor(s) || {}
-    out.push({ id: `${s.n}:${s.card}`, key: s.card, stop: s, at: s.place, title: c.title || s.card, rarity: c.rarity || '', leg: legText(s.leg, i) })
+    out.push({ id: `${s.n}:${s.card}`, key: s.card, stop: s, at: s.place, title: c.title || s.card, rarity: c.rarity || '', leg: legText(s.leg, k) })
   })
-  for (const v of mids) if (v.after >= stops.value.length) out.push(via(v))
   const e = endVia.value
-  if (e && finLeg.value) out.push({ ...via(e), leg: legText(finLeg.value, stops.value.length) })
+  if (e && finLeg.value) out.push({ ...via(e), leg: legText(finLeg.value, order.value.length) })
   return out.map((r, i) => ({ ...r, n: i + 1, trip: tripAt(i) }))
 })
 const fin = computed(() => {
   if (!finLeg.value || endVia.value) return null
   const p = shown.value
   const title = p.end.kind === 'start' ? L.value.start : (p.end.name || L.value.destination)
-  return { title, leg: legText(finLeg.value, stops.value.length), trip: tripAt(rows.value.length) }
+  return { title, leg: legText(finLeg.value, order.value.length), trip: tripAt(rows.value.length) }
 })
 // The map's discs, in the list's numbering
 const mapRows = computed(() => rows.value.map(r => ({ n: r.n, kind: r.via ? 'via' : 'card', at: r.at || null })))
 
-// Add stop: the app's search, inline
+// Add stop: the list's last row; its name opens the app's search in its place
 const adding = ref(false)
-const addSlot = computed(() => (props.stopsEditable && adding.value ? ['add'] : []))
-const toggleAdd = () => {
-  adding.value = !adding.value
-  emit(adding.value ? 'add-open' : 'add-close')
-}
+const openAdd = () => { if (!adding.value) { adding.value = true; emit('add-open') } }
 const closeAdd = () => { if (adding.value) { adding.value = false; emit('add-close') } }
 
 // Moving a stop: the handle's pointer drag, or its arrow keys; indexes in the order given
@@ -519,7 +558,12 @@ const pickEnd = (k) => { if (k !== props.end) emit('end', k) }
 
 // Open: lock the page, focus Back, scroll the panel to the top, Escape closes
 const lock = ttLock // the host's page lock (host.js)
-const onKey = (ev) => { if (ev.key === 'Escape') { ev.preventDefault(); emit('close') } }
+const onKey = (ev) => {
+  if (ev.key !== 'Escape') return
+  ev.preventDefault()
+  if (adding.value) closeAdd() // 1.9.0: an open search closes first
+  else emit('close')
+}
 const opened = async (v) => {
   lock(v)
   if (typeof document === 'undefined') return
