@@ -5,7 +5,7 @@
 // transaction. It never signs anyone in and never reads a content table: each kind shows and unshows
 // its own content inside the module's transaction. The tables are sql/moderation.sql, applied by hand.
 
-export const CONTRACT_VERSION = '1.8.0'
+export const CONTRACT_VERSION = '1.9.0'
 
 const freeze = o => {
   Object.values(o).forEach(v => { if (v && typeof v === 'object') freeze(v) })
