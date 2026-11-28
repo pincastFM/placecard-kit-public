@@ -14,7 +14,9 @@
  * - hand: useTtHand under config.hand's key, with config.hand.scope as the payload's scope.
  * - plan(input, meta): the planning mode's solver. day: solveDay(rules, input, { app, madeBy: null, ...meta }),
  *   a record v2 (meta gives id, set and madeAt); path: solvePath(input, directions), a Promise of
- *   { record, geometry, timingError }. Throws when the config has no planning mode.
+ *   { record, geometry, timingError } (and vias, transit when the input asks for them), with
+ *   { transit } as solvePath's options when the config gives a transit router (1.7.0). Throws when
+ *   the config has no planning mode.
  * - dispose(): stops the hand's watchers. Called inside a component's setup, they stop with the component anyway.
  */
 import { effectScope, markRaw, ref, shallowRef } from 'vue'
@@ -65,6 +67,7 @@ export function createTabletop(config) {
     const p = config.modes.planning
     if (!p) throw new Error('createTabletop: this tabletop has no planning mode (config.modes.planning)')
     if (p.solver === 'day') return solveDay(p.rules, input, { app: config.app, madeBy: null, ...meta })
+    if (p.transit) return solvePath(input, p.directions || null, { transit: p.transit })
     return solvePath(input, p.directions || null)
   }
 

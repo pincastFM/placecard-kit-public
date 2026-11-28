@@ -4,7 +4,9 @@ import type { LatLon, Mode } from './types'
 
 export const MODES: Record<Mode, { mPerMin: number; factor: number; profile: string }> = {
   walk: { mPerMin: 80, factor: 1.3, profile: 'mapbox/walking' },
+  run: { mPerMin: 160, factor: 1.3, profile: 'mapbox/walking' }, // 1.7.0: the walk's streets at an easy jog, a 10-minute mile (6:13 a km)
   bike: { mPerMin: 250, factor: 1.3, profile: 'mapbox/cycling' },
+  transit: { mPerMin: 80, factor: 1.3, profile: 'mapbox/walking' }, // 1.7.0: the TransitRouter times it; the estimate walks, so a plan never counts on a ride
 }
 
 // Straight-line meters; flat-earth at city scale, with the ellipsoid's two degree lengths

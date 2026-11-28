@@ -2,6 +2,7 @@
 import type { DayRules } from '../planner/day/index'
 import type { Directions } from '../planner/directions'
 import type { NamedDirections } from '../planner/path/index'
+import type { TransitRouter } from '../planner/path/transit'
 import type { ModOwnMark } from './moderation'
 
 /** An app: any id of the registry's shape (lowercase letters, digits and hyphens, 32 at most; core TT_APP_ID_RE).
@@ -53,7 +54,8 @@ export interface TtHandConfig {
   store?: TtStore
 }
 
-export type TtPlanning = { solver: 'day'; rules: DayRules } | { solver: 'path'; directions?: NamedDirections | Directions | null }
+/** transit (1.7.0): the host's router for a transit path (otpPlanToLegs over its own OTP call); the kit never fetches */
+export type TtPlanning = { solver: 'day'; rules: DayRules } | { solver: 'path'; directions?: NamedDirections | Directions | null; transit?: TransitRouter | null }
 
 export interface TtModes {
   collection?: boolean

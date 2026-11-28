@@ -9,7 +9,7 @@ export interface LatLon {
 // open: ends at the last stop; start: back where it began; destination: a point the player picks
 export type EndKind = 'open' | 'start' | 'destination'
 
-export type Mode = 'walk' | 'bike'
+export type Mode = 'walk' | 'run' | 'bike' | 'transit' // 1.7.0: run and transit; never a car
 
 // planned: the builder orders (collections); fixed: as given (linear treks); placed: by hand (DMO grid)
 export type OrderRule = 'planned' | 'fixed' | 'placed'

@@ -32,6 +32,8 @@ export interface TtConformanceInstance {
   plans?: TtPlanCase[]
   /** replaces the path solver's Directions adapter for the run (null: the estimate) */
   directions?: unknown
+  /** replaces the path solver's transit router for the run (1.7.0; null: a transit case on the estimate) */
+  transit?: unknown
   /** TtTable props and slots the instance adds when it renders its Tabletop */
   props?: Record<string, unknown>
   slots?: Record<string, (...a: any[]) => unknown>

@@ -228,6 +228,21 @@ describe('createTabletop', () => {
     expect(got.record.totals.timing).toBe('estimate')
     tt.dispose()
   })
+  it('plan, path, with a transit router (1.7.0): solvePath with { transit }, and the router times a transit request', async () => {
+    const transit = vi.fn(async (req) => {
+      const t0 = Date.UTC(2026, 10, 28, 15, 0)
+      return [{ m: 500, min: 6, startTime: t0, endTime: t0 + 6 * 60000, walkM: 500, waitMin: 0, transfers: 0, legs: [], geometry: [[req.from.lon, req.from.lat], [req.to.lon, req.to.lat]] }]
+    })
+    const tt = createTabletop(CONFIG({ app: 'treehopper', modes: { planning: { solver: 'path', transit } } }))
+    const base = PATH_CASES.find(x => x.name === 'a destination, planned, 40 min, streets at 1.2').req
+    const req = { ...base, mode: 'transit', candidates: [], when: { kind: 'leaveAt', tz: 'America/New_York', date: '2026-11-28', at: 600 } }
+    const got = await tt.plan(req)
+    expect(solvePath).toHaveBeenLastCalledWith(req, null, { transit })
+    expect(transit).toHaveBeenCalledTimes(1)
+    expect(got.record.totals.timing).toBe('route')
+    expect(got.transit).toHaveLength(1)
+    tt.dispose()
+  })
   it('plan without a planning mode throws', () => {
     const tt = createTabletop(CONFIG({ modes: { collection: true } }))
     expect(() => tt.plan({})).toThrow(/no planning mode/)

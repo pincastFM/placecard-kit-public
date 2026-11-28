@@ -1,6 +1,11 @@
 // The planner: two solvers, one record (kit CONTRACT.md).
 export { solvePath, planItinerary, planInput, PLAN_VERSION } from './path/index'
-export type { PathPlan, NamedWalk, NamedDirections } from './path/index'
+export type { PathPlan, NamedWalk, NamedDirections, StreetMode, PathRequest, PathOptions } from './path/index'
+// 1.7.0: the time rule, the player's own stops, and transit (the router's interface and its OTP helpers)
+export type { PlanWhen, WhenKind } from './path/when'
+export type { Via, ViaPass } from './path/vias'
+export { buildOtpPlanQuery, otpPlanToLegs, decodePolyline, OTP_PLAN_QUERY } from './path/transit'
+export type { TransitRouter, TransitRequest, TransitItinerary, TransitLeg, TransitPlace, TransitRoute, TransitStep } from './path/transit'
 export { MODES, meters, estMin, estM, reachM } from './path/geo'
 export type { PlanRequest, Candidate, PlanEnd, ItineraryRecord, ItineraryStop } from './path/types'
 export { solveDay, handToDay, dayCore, handEntry, DAY_DEFAULTS, DAY_HOURS, fullRules } from './day/index'

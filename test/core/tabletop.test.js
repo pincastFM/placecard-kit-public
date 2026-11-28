@@ -126,6 +126,8 @@ describe('ttConfigErrors', () => {
     ['an unknown solver', c => { c.modes.planning = { solver: 'tsp' } }, "config.modes.planning.solver: 'day' or 'path', not 'tsp'"],
     ['a day solver without rules', c => { c.modes.planning = { solver: 'day' } }, 'config.modes.planning.rules: the day solver needs its DayRules'],
     ['a path solver with a bad directions', c => { c.modes.planning = { solver: 'path', directions: 'mapbox' } }, 'config.modes.planning.directions: a Directions function'],
+    ['a path solver with a bad transit router (1.7.0)', c => { c.modes.planning = { solver: 'path', transit: 'otp' } }, 'config.modes.planning.transit: a TransitRouter function'],
+    ['a transit router on the day solver', c => { c.modes.planning = { solver: 'day', rules: {}, transit: async () => [] } }, 'config.modes.planning.transit: not a key here'],
     ['a table width that is not one', c => { c.table.widths = { phone: 0, laptop: 150 } }, 'config.table.widths.phone: a width in px'],
     ['a table only that is not a function', c => { c.table.only = true }, 'config.table.only: a function of a card'],
     ['a group label for no group', c => { c.labels.groups = { genus: 'Genus' } }, 'config.labels.groups.genus: not a group'],
@@ -138,6 +140,14 @@ describe('ttConfigErrors', () => {
     ['a missing switch that is not a boolean', c => { c.filters.missing = 'only' }, 'config.filters.missing: a boolean'],
     ['a map that is not a component', c => { c.map = 'LLZoneMap' }, 'config.map: a component'],
   ]
+  it('a path solver takes a transit router beside its directions (1.7.0), or null', () => {
+    for (const transit of [async () => [], null, undefined]) {
+      const c = GOOD()
+      c.modes.planning = { solver: 'path', directions: async () => ({ legs: [], geometry: [] }), transit }
+      expect(ttConfigErrors(c, CONTRACT_VERSION)).toEqual([])
+    }
+  })
+
   for (const [name, change, msg] of CASES) {
     it(`names ${name}`, () => {
       let c = GOOD()

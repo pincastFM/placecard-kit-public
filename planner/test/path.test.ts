@@ -5,7 +5,8 @@
  * treehopper-next 1947477 (read with git show into .pinned/) over the cases in
  * fixtures/path-cases.ts: goldens/path-v1.json. Every later step must give that file back
  * byte for byte:
- * - planner/path/{types,geo,plan}.ts are Treehopper's files, byte for byte
+ * - planner/path/{types,geo,plan}.ts are Treehopper's files, byte for byte (since 1.7.0, types.ts and geo.ts
+ *   with the lines in ADDED_1_7 and nothing else: run and transit in Mode and in MODES)
  * - the moved planItinerary gives path-v1.json
  * - toV1(upgradeV1(v1)) and toV1(solvePath(...).record) give each v1 record back
  * goldens/path-v2.json freezes solvePath's v2 records (the left-over list and its reasons).
@@ -22,6 +23,20 @@ import { toV1, upgradeV1, validateRecord } from '../record'
 import type { PlanRecord } from '../../contract/record'
 
 const FILES = ['types.ts', 'geo.ts', 'plan.ts']
+// 1.7.0's lines in Treehopper's files, each [Treehopper's text, the kit's]: run and transit in Mode and MODES
+const ADDED_1_7: Record<string, [string, string][]> = {
+  'types.ts': [[
+    "export type Mode = 'walk' | 'bike'\n",
+    "export type Mode = 'walk' | 'run' | 'bike' | 'transit' // 1.7.0: run and transit; never a car\n",
+  ]],
+  'geo.ts': [[
+    "  walk: { mPerMin: 80, factor: 1.3, profile: 'mapbox/walking' },\n  bike: { mPerMin: 250, factor: 1.3, profile: 'mapbox/cycling' },\n",
+    "  walk: { mPerMin: 80, factor: 1.3, profile: 'mapbox/walking' },\n"
+      + "  run: { mPerMin: 160, factor: 1.3, profile: 'mapbox/walking' }, // 1.7.0: the walk's streets at an easy jog, a 10-minute mile (6:13 a km)\n"
+      + "  bike: { mPerMin: 250, factor: 1.3, profile: 'mapbox/cycling' },\n"
+      + "  transit: { mPerMin: 80, factor: 1.3, profile: 'mapbox/walking' }, // 1.7.0: the TransitRouter times it; the estimate walks, so a plan never counts on a ride\n",
+  ]],
+}
 const V1 = FILES.map((f) => `lib/placecard/itinerary/${f}`)
 const haveTreehopper = hasPin(TREEHOPPER)
 const SOURCE = `Treehopper ${TREEHOPPER.commit.slice(0, 7)}`
@@ -36,10 +51,15 @@ describe('path solver: Treehopper at 1947477 (the freeze)', () => {
 })
 
 describe('path solver: moved into the kit', () => {
-  it.skipIf(!haveTreehopper)('planner/path is Treehopper\'s files byte for byte', () => {
+  it.skipIf(!haveTreehopper)('planner/path is Treehopper\'s files byte for byte (types.ts and geo.ts with 1.7.0\'s lines)', () => {
     for (const f of FILES) {
       const ours = readFileSync(resolve(__dirname, '..', 'path', f))
-      expect(ours.equals(gitShow(TREEHOPPER, `lib/placecard/itinerary/${f}`)), f).toBe(true)
+      let theirs = gitShow(TREEHOPPER, `lib/placecard/itinerary/${f}`).toString('utf8')
+      for (const [was, now] of ADDED_1_7[f] || []) {
+        expect(theirs.split(was).length - 1, `${f}: Treehopper's line, once`).toBe(1)
+        theirs = theirs.replace(was, now)
+      }
+      expect(ours.equals(Buffer.from(theirs, 'utf8')), f).toBe(true)
     }
   })
 

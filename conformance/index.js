@@ -13,7 +13,8 @@
  *
  * The instance:
  * - config: as createTabletop takes it. The suite swaps in `source` (the collection below) and the hand's store
- *   (in memory); with `directions` given, the path solver's adapter too. Everything else is the instance's.
+ *   (in memory); with `directions` given, the path solver's adapter too, and with `transit` (1.7.0) its transit
+ *   router. Everything else is the instance's.
  * - collection: what config.source.load() returns for the fixture.
  * - css: the instance's own stylesheets for its table (text, or { name, text }); base: the kit sheet under them,
  *   'cardroom' or 'table'.
@@ -112,6 +113,7 @@ export function ttConformance(instance) {
   const runConfig = (store = memStore()) => {
     const c = { ...config, source: { load: async () => collection }, hand: { ...config.hand, store } }
     if (planning && planning.solver === 'path' && 'directions' in instance) c.modes = { ...config.modes, planning: { ...planning, directions: instance.directions } }
+    if (planning && planning.solver === 'path' && 'transit' in instance) c.modes = { ...c.modes, planning: { ...c.modes.planning, transit: instance.transit } }
     return c
   }
 

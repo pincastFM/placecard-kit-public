@@ -56,7 +56,7 @@ export function validateRecord(r: unknown): Check {
     if (end.kind === 'destination' && end.at === null) bad('end.at: a destination needs a point')
     if (!strOrNull(end.name)) bad('end.name: not a string or null')
   }
-  if (!['walk', 'bike'].includes(r.mode)) bad('mode: not walk or bike')
+  if (!['walk', 'run', 'bike', 'transit'].includes(r.mode)) bad('mode: not walk, run, bike or transit')
   if (r.minutes !== null && !nonNeg(r.minutes)) bad('minutes: not a number or null')
   if (!['planned', 'fixed', 'placed'].includes(r.order)) bad('order: not planned, fixed or placed')
 

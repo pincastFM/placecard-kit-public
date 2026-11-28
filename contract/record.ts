@@ -11,9 +11,10 @@ export interface LatLon {
 }
 
 export type EndKind = 'open' | 'start' | 'destination'
-export type Mode = 'walk' | 'bike'
+// walk unless a request names another (1.7.0: run and transit); there is no car mode
+export type Mode = 'walk' | 'run' | 'bike' | 'transit'
 export type OrderRule = 'planned' | 'fixed' | 'placed'
-// mapbox: Mapbox's streets; route: the app's own router; estimate: straight lines, the planner's walking pace
+// mapbox: Mapbox's streets; route: the app's own router or its transit router; estimate: straight lines at the mode's pace
 export type Timing = 'mapbox' | 'route' | 'estimate'
 export type StopStatus = 'planned' | 'skipped' | 'collected'
 
@@ -31,7 +32,7 @@ export interface Leg {
   min: number
 }
 
-// The wall clock a timed day runs on; every minute in the record counts from startAt
+// The wall clock a timed day or a path planned with a time rule runs on; every minute in the record counts from startAt
 export interface PlanClock {
   tz: string        // IANA, e.g. America/Denver
   date: string      // YYYY-MM-DD on that clock
@@ -76,7 +77,7 @@ export interface PlanRecord {
   madeAt: string
   planVersion: 2
   solver: { id: SolverId }
-  clock: PlanClock | null  // null: a walk with no wall clock (path)
+  clock: PlanClock | null  // null: a day with no window, or a path planned with no time rule (when)
   start: LatLon | null     // null: a day with no center
   end: { kind: EndKind; at: LatLon | null; name: string | null }
   mode: Mode

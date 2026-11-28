@@ -24,7 +24,7 @@ It returns:
 - `load()`: runs `config.source.load()`, one call at a time (a second call while one runs gets the same promise). It checks the collection, and on a problem it sets `error` and returns null. Otherwise it adds `faces: config.faces` when the collection has none, then keeps the collection and returns it.
 - `table`: a shallow ref of the mounted table's handle (`t`, `T`, `change`, `openCard`, `deal`, `openNest`, `closeNest`, `over`, `pop`). `Tabletop` sets it on mount and clears it on unmount.
 - `hand`: the hand under `config.hand`: `hand`, `ready`, `key`, `count`, `has`, `add`, `remove`, `move`, `toggle`, `restore`, `clear`.
-- `plan(input, meta)`: the planning mode's solver. `day` returns a plan record (meta gives `id`, `set` and `madeAt`); `path` returns a promise of `{ record, geometry, timingError }`. It throws when the config has no planning mode.
+- `plan(input, meta)`: the planning mode's solver. `day` returns a plan record (meta gives `id`, `set` and `madeAt`); `path` returns a promise of `{ record, geometry, timingError }`, plus `vias` and `transit` when the input asks for them (section 8). It throws when the config has no planning mode.
 - `Tabletop`: the component. Its props are `tabletop` and `autoload` (default true: `load()` on mount when there's no collection yet). Its root is `TtTable`, so a class, listeners and any `TtTable` prop the config doesn't hold reach the table, and every slot passes through.
 - `dispose()`: stops the hand's watchers. Inside a component's setup they stop with the component anyway.
 
@@ -40,7 +40,7 @@ It returns:
 | `faces` | yes | The faces the cards may take: an object keyed by face id, or a list of `{ id }`. A kit face (`TT_FACES`: `stop`, `destination`, `treehopper`, `studio`) takes `{}`, and never a `base` or a `component`. The app's own face, under an id of `TT_FACE_ID_RE` (`/^[a-z][a-z0-9-]{0,31}$/`), gives `base` (a kit face draws it) or `component` (the app's Vue component draws it); given both, the component draws. Any entry may set `print` (a boolean), the open card's print motion for that face. Every face the cards take goes here, the default included: `stop` for a card that names none and whose set names none, `destination` for a card from the `registry` subpath unless its set or app names another. `createTabletop` refuses an empty `faces`, and `load()` refuses a card whose face isn't here, so an app whose registry cards all take the default still writes one line: `faces: { destination: {} }`. Declare them once; the collection doesn't need to repeat them. See section 6. |
 | `theme` | yes | `{ class, fonts?, htmlAttrs? }`: the class on the table root that supplies the theme tokens (section 5; never `tt`), its font stylesheets (https URLs, or `{ key, href }`) and its `<html>` attributes. Left out, `fonts` is the Card room's, the fonts the theme tokens name; `fonts: []` turns them off. The table hands the fonts and attributes to the host's `head`. `TT_CARDROOM_THEME` is the Card room's. |
 | `hand` | yes | `{ key, scope, store? }`: the storage key and the hand's scope (each a string, a ref or a getter), and a `{ get, set, remove }` store (default `safeLocal`, localStorage that never throws). The kit keeps the stored shape, `{ v: HAND_V, zone, entries }`. |
-| `modes` | yes | `collection: true`, `planning`, or both. `planning` is `{ solver: 'day', rules }` (rules: the app's `DayRules`) or `{ solver: 'path', directions? }`. |
+| `modes` | yes | `collection: true`, `planning`, or both. `planning` is `{ solver: 'day', rules }` (rules: the app's `DayRules`) or `{ solver: 'path', directions?, transit? }` (`transit`: the app's `TransitRouter`, section 8). |
 | `table` | no | `{ key, widths: { phone, laptop }, stacked, only }`: the storage key of the remembered view, the starting card widths in px, whether piles open stacked, and the table's own filter (a function of a card). |
 | `labels` | no | The table's words, each a string, and `groups`: `{ [group id]: label }`. Unset, the kit's English. |
 | `links` | no | `{ back: { label, href }, empty: [{ label, href }] }`. |
@@ -86,7 +86,7 @@ With no host, there are no head entries, the distance unit is `mi` for the page,
 | `core` | Framework-free ESM: the table's logic, piles, filters, the hand, face logic, map marks, the config and collection checks, the token and class lists, safe storage, the pack's look. Runs in Node. |
 | `vue` | `createTabletop`, `Tabletop`, `TtTable`, `TtFace`, `TtCard`, `TtStage`, `TtRail`, `TtRuler`, `TtSearch`, `TtDay`, `TtPath`, `TtPack`, the moderation parts (`TtReport`, `TtModChip`, `TtModHide`, `TtModSwitches`, `TtModQueue`), `useTtTable`, `useTtHand` and the host hooks. Vue `>=3.3.4 <4` is the one peer; the `.vue` files ship as source. `vue/*.vue` and `vue/*.js` import one file at a time. |
 | `css/*` | `table.css` (the mechanics tokens and every rule; reads tokens only), `themes/cardroom.css` (the Card room theme), `cardroom.css` (the two joined; `TtTable` loads it), `moderation.css` (the moderation parts, `--tt-mod-*` tokens only). |
-| `planner` | The plan record (version 2), its validator and `upgradeV1()`, the `path` and `day` solvers, `planInput`, `DayRules`, the Directions adapter's interface. Server-safe, no map library. |
+| `planner` | The plan record (version 2), its validator and `upgradeV1()`, the `path` and `day` solvers, `planInput`, `DayRules`, the Directions adapter's interface, the transit router's interface and its OpenTripPlanner helpers (`buildOtpPlanQuery`, `otpPlanToLegs`, `decodePolyline`). Server-safe, no map library. |
 | `contract` | TypeScript types: the config, the collection, the record, theme token names, the moderation shapes. |
 | `nav` | `createNavFollower(map, opts)`: a walking camera that turns the map to the route ahead and moves the camera and the person's dot in the same frame. Its only dependencies are seven `@turf/*` packages. |
 | `arrival` | One arrival check for every app, with each app's rule as config: `checkArrival`, `holdArrival`, `arrivalStep`, `observeArrival`, and Placecard's own rule (`placecardRule`, `pcCollectCheck`). Server-safe. |
@@ -194,9 +194,13 @@ A plan is a plain object, the same for both solvers, with its keys in this order
 ```
 
 - `solver.id`: `path` is a walk through places; `day` is a timed day from a hand of cards.
-- `clock`: the wall clock a timed day runs on (an IANA `tz`, `date` as YYYY-MM-DD, `startAt` in minutes past midnight). Every minute in the record counts from `startAt`. A path has no clock.
+- `clock`: the wall clock the plan runs on (an IANA `tz`, `date` as YYYY-MM-DD, `startAt` in minutes past midnight). Every minute in the record counts from `startAt`. A timed day has one. A path may have one: a path planned with a time rule (`when`, below) carries its solved start, and a path planned without one has `null`, as every path did before 1.7.0.
+- `mode` is `walk`, `run`, `bike` or `transit`, and `walk` when the request names none. There is no car mode, and the solver throws on any mode not in `MODES`. `run` asks the Directions adapter for the walk's streets (`walk`) and times each leg's meters at `MODES.run`'s pace; the adapter is only ever asked for `walk` or `bike`. `transit` is timed by the app's `TransitRouter` (`modes.planning.transit`, or `solvePath(input, directions, { transit })`), one leg at a time, and with none, or when it fails, the estimate stands at the walk's pace.
+- The path request may carry `when`: `{ kind: 'now', tz }`, `{ kind: 'leaveAt', tz, at, date? }` or `{ kind: 'arriveBy', tz, at, date? }`, with `at` in minutes past midnight on `tz`'s clock and `date` that clock's today when left out. Leave now or at: the start is that time. Arrive by: the time allowed is cut to the minutes left before it, and the start is solved back from it; a transit path asks the router to arrive by it. The rule itself is planner input only; the record keeps the solved `clock`.
+- The path request may carry `vias`, the player's own stops (`{ lat, lon, label? }`), passed in the order given, with cards filling in between them to fit the time (a planned order only). The record's stops are still only cards: each leg runs through the vias between a card and the one before it, and with an open end the last via is the end, recorded as a destination named by its label. Where the line passes each via comes back beside the record, in the plan's `vias`.
+- A transit path's rides (route names and colors, headsigns, stops, times and lines) come back beside the record, in the plan's `transit`, one entry a leg of the line; they never go into the record's stops.
 - A stop is `{ n, kind, card, place, leg, arriveMin, dwellMin, status, label, meal, fromHand, alts }`, with `kind` one of `see`, `eat` or `event`, and `place` either `{ id, lat, lon }` or null.
-- `totals` is `{ stops, m, walkMin, totalMin, timing, leftOver }`. `timing` is `mapbox`, `route` (an app's own router) or `estimate`.
+- `totals` is `{ stops, m, walkMin, totalMin, timing, leftOver }`. `timing` is `mapbox`, `route` (an app's own router, and a transit router's times) or `estimate`.
 - `leftOver` lists `{ key, kind, reason }` for each card wanted and not placed.
 - `ext` holds app-only fields. The kit never reads them.
 - Version 1 records stay as they were written and are read through `upgradeV1()`.
@@ -204,7 +208,7 @@ A plan is a plain object, the same for both solvers, with its keys in this order
 ## 9. What the kit never does
 
 - **Fetch your data.** `source.load()` hands the table its collection, and the `registry` subpath maps data you fetched yourself. Two parts make requests, and only when your app uses them: the moderation components call your own endpoints (`TT_MOD_ENDPOINTS`, or your `request` function), and `ntfyAlert` posts to ntfy when your server calls it with a topic.
-- **Hold a key or sign anyone in.** The person, their session and every key stay with your app. A call that needs a key goes through your server.
+- **Hold a key or sign anyone in.** The person, their session and every key stay with your app. A call that needs a key goes through your server. The transit router is yours too: the kit builds the OpenTripPlanner query and reads its answer, and your server sends it, with its own base URL and secret.
 - **Write to the page on its own.** Fonts, `<html>` attributes and the page lock go through the host hooks.
 - **Read a plan's `ext`**, or any field an app keeps for itself.
 - **Refuse an arrival.** `arrival` returns verdicts. It never refuses, throws, stores or fetches; what a verdict does is the app's call.
@@ -237,4 +241,10 @@ What each version added:
   - A registry card with its own `url` (http or https) opens that page, in a new tab, and its button reads "Open in" and the app's name. With no `url` it opens Placecard's card page. A set's own `action` still wins.
   - The Studio foot always prints the app's name and site, drops the site's `https://`, and links the name to the app on an open card.
 - **1.6.1:** the table's head says "1 Card" at one card, where it said "1 Cards" (`labels.card`; an app that sets `labels.cards` alone keeps its word). No face changes.
+- **1.7.0:** routing.
+  - Two more modes, `run` (the walk's streets at 160 m a minute) and `transit` (the app's `TransitRouter`); never a car. `walk` is still the default.
+  - A path's time rule, `when`: leave now, leave at, arrive by. Its solved start is the record's `clock`, so a path may now have one.
+  - The player's own stops, `vias`, in her order, with cards filling in between; the plan's `vias` says where the line passes each.
+  - Transit: `modes.planning.transit` (or `solvePath`'s `{ transit }`), and pure helpers for an OpenTripPlanner 2.x server: `buildOtpPlanQuery`, `otpPlanToLegs`, `decodePolyline`. The kit still fetches nothing.
+  - A request that names none of these plans as 1.6.2 did, and every golden is as it was.
 - **1.6.2:** the moderation parts' buttons take their own type again: Report, Hide, Restore and Retry at .8125em and weight 600, the sheet's and the queue's buttons at .875em, all in `--tt-mod-font-label`. A tab not chosen and a switch at Off read `--tt-mod-ink-2`, and a tab sits on the tabs' rule. Retry in a failure line takes the line's own size. `css/moderation.css` only. No face changes.

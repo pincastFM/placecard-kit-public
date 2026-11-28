@@ -1,7 +1,7 @@
 // Types for vue/createTabletop.js (kit CONTRACT.md).
 import type { Component, Ref, ShallowRef } from 'vue'
 import type { TabletopConfig, TtCollection } from '@pincast/placecard-kit/contract'
-import type { DayInput, PathPlan, PlanRecord, PlanRequest, RecordMeta } from '@pincast/placecard-kit/planner'
+import type { DayInput, PathPlan, PathRequest, PlanRecord, RecordMeta } from '@pincast/placecard-kit/planner'
 
 export interface TtHandEntry { key: string; kind: 'card' | 'event' }
 
@@ -43,9 +43,9 @@ export interface Tabletop {
   load(): Promise<TtCollection | null>
   table: ShallowRef<TtTableHandle | null>
   hand: TtHand
-  /** day: a record v2; path: a Promise of { record, geometry, timingError } */
+  /** day: a record v2; path: a Promise of { record, geometry, timingError } (1.7.0: and vias, transit when asked) */
   plan(input: DayInput, meta: Partial<RecordMeta> & Pick<RecordMeta, 'id' | 'set' | 'madeAt'>): PlanRecord
-  plan(input: PlanRequest): Promise<PathPlan>
+  plan(input: PathRequest): Promise<PathPlan>
   Tabletop: Component
   dispose(): void
 }

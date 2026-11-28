@@ -226,13 +226,14 @@ export function ttConfigErrors(config, version) {
       if (m.collection !== true && m.planning === undefined) errs.push('config.modes: collection, planning or both')
       if (m.planning !== undefined) {
         const p = m.planning
-        if (!isObj(p)) errs.push("config.modes.planning: { solver: 'day', rules } or { solver: 'path', directions? }")
+        if (!isObj(p)) errs.push("config.modes.planning: { solver: 'day', rules } or { solver: 'path', directions?, transit? }")
         else if (p.solver === 'day') {
           unknownKeys(errs, p, ['solver', 'rules'], 'config.modes.planning')
           if (!isObj(p.rules)) errs.push('config.modes.planning.rules: the day solver needs its DayRules')
         } else if (p.solver === 'path') {
-          unknownKeys(errs, p, ['solver', 'directions'], 'config.modes.planning')
+          unknownKeys(errs, p, ['solver', 'directions', 'transit'], 'config.modes.planning')
           if (p.directions !== undefined && p.directions !== null && !isFn(p.directions)) errs.push('config.modes.planning.directions: a Directions function')
+          if (p.transit !== undefined && p.transit !== null && !isFn(p.transit)) errs.push('config.modes.planning.transit: a TransitRouter function')
         } else errs.push(`config.modes.planning.solver: 'day' or 'path', not '${p.solver}'`)
       }
     }
