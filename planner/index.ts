@@ -4,6 +4,8 @@ export type { PathPlan, NamedWalk, NamedDirections, StreetMode, PathRequest, Pat
 // 1.7.0: the time rule, the player's own stops, and transit (the router's interface and its OTP helpers)
 export type { PlanWhen, WhenKind, WhenTime } from './path/when'
 export { WhenError, LEAVE_GRACE_MIN } from './path/when'
+// 1.8.0: the clock helpers, so a host reads a place's wall clock as the planner does
+export { wallOf, epochOf, clockAt } from './path/when'
 export type { Via, ViaPass } from './path/vias'
 export { buildOtpPlanQuery, otpPlanToLegs, decodePolyline, OTP_PLAN_QUERY } from './path/transit'
 export type { TransitRouter, TransitRequest, TransitItinerary, TransitLeg, TransitPlace, TransitRoute, TransitStep } from './path/transit'

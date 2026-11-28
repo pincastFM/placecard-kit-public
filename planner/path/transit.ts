@@ -24,6 +24,7 @@ export interface TransitRequest {
   arriveBy: boolean // true: arrive at `to` by date and time; false: leave `from` then
   tz: string        // the clock date and time are read on (OTP reads them on its own feed's)
   numItineraries?: number // how many to ask for; 3 when left out
+  walkSpeed?: number      // 1.8.0: the walk's speed in m/s (a host's pace on the walks between rides); OTP's own when left out
 }
 
 export interface TransitPlace {
@@ -118,6 +119,12 @@ export const OTP_PLAN_QUERY = `query PlacecardPlan($fromLat: Float!, $fromLon: F
   }
 }`
 
+// 1.8.0: the same query with the walk's speed (m/s) set, for a host that paces its walks; a request without
+// walkSpeed sends OTP_PLAN_QUERY exactly as 1.7.0 did
+export const OTP_PLAN_QUERY_WALK_SPEED = OTP_PLAN_QUERY
+  .replace('$numItineraries: Int!) {', '$numItineraries: Int!, $walkSpeed: Float!) {')
+  .replace('    numItineraries: $numItineraries\n', '    numItineraries: $numItineraries\n    walkSpeed: $walkSpeed\n')
+
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 const TIME_RE = /^\d{2}:\d{2}(:\d{2})?$/
 const isLatLon = (p: any) => !!p && Number.isFinite(p.lat) && Number.isFinite(p.lon) && Math.abs(p.lat) <= 90 && Math.abs(p.lon) <= 180
@@ -133,14 +140,15 @@ export function buildOtpPlanQuery(input: TransitRequest): { query: string; varia
   if (typeof i.arriveBy !== 'boolean') errs.push('arriveBy: not true or false')
   const n = i.numItineraries === undefined ? 3 : i.numItineraries
   if (!Number.isInteger(n) || n < 1) errs.push('numItineraries: a whole number, 1 or more')
+  const ws = i.walkSpeed
+  if (ws !== undefined && !(typeof ws === 'number' && Number.isFinite(ws) && ws > 0)) errs.push('walkSpeed: m/s, above 0')
   if (errs.length) throw new TypeError(`buildOtpPlanQuery: ${errs.join('; ')}`)
-  return {
-    query: OTP_PLAN_QUERY,
-    variables: {
-      fromLat: i.from.lat, fromLon: i.from.lon, toLat: i.to.lat, toLon: i.to.lon,
-      date: i.date, time: i.time.length === 5 ? `${i.time}:00` : i.time, arriveBy: i.arriveBy, numItineraries: n,
-    },
+  const variables: Record<string, unknown> = {
+    fromLat: i.from.lat, fromLon: i.from.lon, toLat: i.to.lat, toLon: i.to.lon,
+    date: i.date, time: i.time.length === 5 ? `${i.time}:00` : i.time, arriveBy: i.arriveBy, numItineraries: n,
   }
+  if (ws === undefined) return { query: OTP_PLAN_QUERY, variables }
+  return { query: OTP_PLAN_QUERY_WALK_SPEED, variables: { ...variables, walkSpeed: ws } }
 }
 
 const num = (x: unknown, or = 0) => (typeof x === 'number' && Number.isFinite(x) ? x : or)

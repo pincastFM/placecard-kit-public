@@ -86,7 +86,7 @@ With no host, there are no head entries, the distance unit is `mi` for the page,
 | `core` | Framework-free ESM: the table's logic, piles, filters, the hand, face logic, map marks, the config and collection checks, the token and class lists, safe storage, the pack's look. Runs in Node. |
 | `vue` | `createTabletop`, `Tabletop`, `TtTable`, `TtFace`, `TtCard`, `TtStage`, `TtRail`, `TtRuler`, `TtSearch`, `TtDay`, `TtPath`, `TtPack`, the moderation parts (`TtReport`, `TtModChip`, `TtModHide`, `TtModSwitches`, `TtModQueue`), `useTtTable`, `useTtHand` and the host hooks. Vue `>=3.3.4 <4` is the one peer; the `.vue` files ship as source. `vue/*.vue` and `vue/*.js` import one file at a time. |
 | `css/*` | `table.css` (the mechanics tokens and every rule; reads tokens only), `themes/cardroom.css` (the Card room theme), `cardroom.css` (the two joined; `TtTable` loads it), `moderation.css` (the moderation parts, `--tt-mod-*` tokens only). |
-| `planner` | The plan record (version 2), its validator and `upgradeV1()`, the `path` and `day` solvers, `planInput`, `DayRules`, the Directions adapter's interface, the transit router's interface and its OpenTripPlanner helpers (`buildOtpPlanQuery`, `otpPlanToLegs`, `decodePolyline`). Server-safe, no map library. |
+| `planner` | The plan record (version 2), its validator and `upgradeV1()`, the `path` and `day` solvers, `planInput`, `DayRules`, the Directions adapter's interface, the transit router's interface and its OpenTripPlanner helpers (`buildOtpPlanQuery`, `otpPlanToLegs`, `decodePolyline`), and the clock helpers the time rule reads (`wallOf`, `epochOf`, `clockAt`, 1.8.0). Server-safe, no map library. |
 | `contract` | TypeScript types: the config, the collection, the record, theme token names, the moderation shapes. |
 | `nav` | `createNavFollower(map, opts)`: a walking camera that turns the map to the route ahead and moves the camera and the person's dot in the same frame. Its only dependencies are seven `@turf/*` packages. |
 | `arrival` | One arrival check for every app, with each app's rule as config: `checkArrival`, `holdArrival`, `arrivalStep`, `observeArrival`, and Placecard's own rule (`placecardRule`, `pcCollectCheck`). Server-safe. |
@@ -174,12 +174,23 @@ A face draws a card, front and back. `TtFace` draws every face, and `TtTable`, `
 | `TtSearch` | `query`, `opening` |
 | `TtRuler` | `preview`, `commit` (the card width) |
 | `TtDay` | `close`, `deal`, `map`, `card` (a card's key) |
-| `TtPath` | `close`, `home`, `minutes`, `start`, `end`, `card` (a card's key) |
+| `TtPath` | `close`, `home`, `minutes`, `start`, `end`, `card` (a card's key); 1.8.0: `mode` (the mode picked), `when` (`{ kind: 'now' \| 'at' \| 'by', time: 'HH:MM' \| null }`), `move` (`{ from, to }`, indexes in the order given), `remove` (a via's index), `add-open`, `add-close` |
 | `TtPack` | `done`, once, when the card is out of the pack |
 | `TtReport` | `reported` (`{ kind, ref, reason, already }`) |
 | `TtModHide` | `moved` (`{ move, kind, ref, result }`) |
 | `TtModQueue` | `update:tab`, `counts`, `moved` (`{ move, row, result }`), `denied` |
 | `TtModSwitches` | `load`, `change`, `denied` |
+
+### The planner's route controls (`TtPath`, 1.8.0)
+
+Each is off until the app passes its prop, so an app that passes none of them gets 1.7.0's markup, byte for byte (`test/vue/path180gold.test.js`). As everywhere in the kit, the structure, the classes, the events and the words are the kit's, and the look is the app's CSS.
+
+- **By:** `modeOptions` (any of `walk`, `run`, `bike`, `transit`; never a car) and `mode` (`walk` by default): a chip row under From, above Time. The summary's word follows the mode once modes are offered (`labels` `walking`, `running`, `biking`, `byTransit`).
+- **When:** `whenOptions` (any of `now`, `at`, `by`) and `when` (`{ kind, time }`): a chip row after Time. The picked Leave at or Arrive by chip holds its time ("Leave 3:15 PM") and wraps a native time input, `input.tt-path-time`, for the app to lay over the chip; a pick with no time yet takes the next quarter hour on the place's clock (`tz`, or the device's). Times read on a 12-hour clock unless the app gives `clockFmt(minutes past midnight)`. The rule itself is the app's to send: the planner's `when` (section 8).
+- **Unmet:** `whenError` (`{ code, earliestArrival }`, a `WhenError`'s fields): with `code` `unmet`, the summary adds `labels.unmet` ("Leave now, arrive 2:40 PM", from `earliestArrival.at`), or `labels.unmetNone` ("Leave now") with no arrival.
+- **The player's own stops:** `vias` (the plan's via passes) and `stopsEditable`. The list is one list with one numbering: each via after the cards placed before it, as `li.is-via` with an × (`remove`) and a drag handle at its end (`button.tt-path-drag`: a pointer drag on the handle, or its arrow keys; `move`). Card rows never drag. An open end's last via is the list's last row, with the finish leg. With `stopsEditable`, a Stops row under End holds Add stop, which opens the `add` slot (`{ close }`) inline. The `map` slot's `rows` (`{ n, kind: 'card' | 'via', at }`) follow the list's numbering.
+- **Transit legs:** `trips` (the app's trip for each leg of the line, or null): a leg with a trip reads a badge per ride (`span.tt-path-badge`, the route's short name in its color and text color, or `is-plain`), the rides' minutes and the walk's ("walk 4 min"). The summary keeps the record's minutes.
+- **New labels:** `by`, `walk`, `run`, `bike`, `transit`, `running`, `biking`, `byTransit`, `when`, `now`, `leaveAt`, `arriveBy`, `leaveTime`, `arriveTime`, `unmet`, `unmetNone`, `stops`, `addStop`, `via`, `moveStop`, `removeStop`, `walkMin`, `ride`.
 
 ## 8. The plan record, version 2
 
@@ -199,6 +210,7 @@ A plan is a plain object, the same for both solvers, with its keys in this order
 - The path request may carry `when`: `{ kind: 'now', tz }`, `{ kind: 'leaveAt', tz, at, date? }` or `{ kind: 'arriveBy', tz, at, date? }`, with `at` in minutes past midnight on `tz`'s clock. With no `date`, `at` is its next time on that clock: an arrive by that has passed today is tomorrow's, and so is a leave at that passed more than `LEAVE_GRACE_MIN` (15) minutes ago, while one that passed within them means leave now. With a `date`, it is that day's: an arrive by that has passed, or a leave at more than 15 minutes ago, throws a `WhenError` with `code: 'passed'`, and a leave at within them means leave now. Leave now or at: the start is that time. Arrive by: the time allowed is cut to the minutes left before it, and the start is solved back from it; a transit path asks the router to arrive by it. With an open end the walk ends at its last stop, so an arrive by counts that stop's minutes too: the walk is over by the time. An arrive by the plan cannot make (its start would come before now) throws a `WhenError` with `code: 'unmet'` and `earliestArrival`: leaving now, when the plan reaches its end (an open end's: when its last stop's minutes are up), as `{ ms, tz, date, at }` with `at` rounded up to the minute, or `null` when no way was found. So the app can offer to leave now. The rule itself is planner input only; the record keeps the solved `clock`.
 - The path request may carry `vias`, the player's own stops (`{ lat, lon, label? }`), passed in the order given, with cards filling in between them to fit the time (a planned order only). The record's stops are still only cards: each leg runs through the vias between a card and the one before it, and with an open end the last via is the end, recorded as a destination named by its label. Where the line passes each via comes back beside the record, in the plan's `vias`.
 - A transit path's rides (route names and colors, headsigns, stops, times and lines) come back beside the record, in the plan's `transit`, one entry a leg of the line; they never go into the record's stops.
+- `buildOtpPlanQuery` takes an optional `walkSpeed` (1.8.0, metres a second), the speed of the walks between rides, for a host that paces its walks; OpenTripPlanner's own speed when it is left out, and then the query and its variables are 1.7.0's, byte for byte.
 - A stop is `{ n, kind, card, place, leg, arriveMin, dwellMin, status, label, meal, fromHand, alts }`, with `kind` one of `see`, `eat` or `event`, and `place` either `{ id, lat, lon }` or null.
 - `totals` is `{ stops, m, walkMin, totalMin, timing, leftOver }`. `timing` is `mapbox`, `route` (an app's own router, and a transit router's times) or `estimate`.
 - `leftOver` lists `{ key, kind, reason }` for each card wanted and not placed.
@@ -250,3 +262,9 @@ What each version added:
   - A request that names none of these plans as 1.6.2 did, and every golden is as it was.
   - `Mode` has two more members, so a host's exhaustive `Record<Mode, ...>` fails its type check until it adds `run` and `transit`. Nothing changes at run time.
   - A 1.6.2 validator rejects a record whose mode is `run` or `transit`, so an app that validates other apps' records moves to 1.7.0 before any app writes those modes.
+- **1.8.0:** the planner's route controls.
+  - `TtPath`: By (`modeOptions`, `mode`), When (`whenOptions`, `when`, `tz`, `clockFmt`), the unmet line (`whenError`), the player's own stops in the list (`vias`, `stopsEditable`, the `add` slot, `move`, `remove`) and transit legs (`trips`). Each is off until its prop is given, and a host that passes none of them renders what 1.7.0 rendered.
+  - The `map` slot also gets `rows`, the list's numbering.
+  - `planner` exports the clock helpers, `wallOf`, `epochOf` and `clockAt`.
+  - `buildOtpPlanQuery` takes an optional `walkSpeed`; without it the query is 1.7.0's.
+  - Nine more `tt-path-` classes in `TT_CLASSES`. No record, mechanic or golden changes; no face changes.

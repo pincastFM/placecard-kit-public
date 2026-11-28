@@ -37,7 +37,7 @@ A golden is a saved output (rendered HTML, a solved plan, a grid of arrival verd
 
 - A golden changes only on purpose, and the pull request says which output changed and what the change is for.
 - A golden that changes because a mechanic changed (a pile, the flip, the deal, a gesture) means a major version. See [Versions](CONTRACT.md#10-versions).
-- To rewrite one after an intended change, run its test with the variable its file names. That's `UPDATE_GOLDENS=1` for the planner, arrival and conformance goldens. The component goldens under `test/vue/goldens/` each name their own (`K1_WRITE`, `K2_WRITE`, `U2_WRITE`, `U3_WRITE`, `V13_WRITE`, `PL035_WRITE`). Read the diff before you commit it.
+- To rewrite one after an intended change, run its test with the variable its file names. That's `UPDATE_GOLDENS=1` for the planner, arrival and conformance goldens. The component goldens under `test/vue/goldens/` each name their own (`K1_WRITE`, `K2_WRITE`, `U2_WRITE`, `U3_WRITE`, `V13_WRITE`, `PL035_WRITE`, `P180_WRITE`). Read the diff before you commit it.
 
 ## Tests that need Pincast's private repos
 
