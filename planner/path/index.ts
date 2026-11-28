@@ -13,8 +13,8 @@ import type { LeftOver, PlanRecord } from '../../contract/record'
 import { upgradeV1 } from '../record'
 import { planVias, viaAnchors, viaInReach, viaPoints } from './vias'
 import type { Via, ViaPass, ViaPoint } from './vias'
-import { clockAt, resolveWhen } from './when'
-import type { PlanWhen } from './when'
+import { clockAt, resolveWhen, unmetError } from './when'
+import type { PlanWhen, ResolvedWhen } from './when'
 import { transitTimer } from './transit'
 import type { TransitChain, TransitItinerary, TransitRouter } from './transit'
 
@@ -66,7 +66,9 @@ export interface PathOptions {
  * with none, the estimate stands; a mode left out is walk, and any other (a car) throws. when gives
  * the record a clock: leave now or at, its start; arrive by, the time allowed is cut to the minutes
  * left before it and the start is solved back from it (transit: the router's arrive by). vias go to
- * the via solver. Each throws an Error naming the field when it cannot be read.
+ * the via solver. Each throws an Error naming the field when it cannot be read. An arrive by the
+ * plan cannot make (its start would come before now) throws a WhenError, code 'unmet', with the
+ * earliest arrival leaving now when it was found (resolveWhen's 'passed' is the other code).
  */
 export async function solvePath(req: PathRequest, directions: NamedDirections | Directions | null, opts: PathOptions = {}): Promise<PathPlan> {
   const mode: Mode = req.mode == null ? 'walk' : req.mode
@@ -125,12 +127,24 @@ export async function solvePath(req: PathRequest, directions: NamedDirections | 
     inReachOf = (c) => inReach(c, asked, endAt)
   }
 
-  // transit: the rides of the line the record ended on (the last timing, when it timed that line);
-  // a record on an earlier timing of the same line (plan.ts's timed stops) takes the chain's legs
+  // transit: the rides of the line the record ended on (the last timing, when it timed that line).
+  // plan.ts may keep an earlier timing's first stops and ask again for their line (an open end over
+  // the time): the new rides re-time the record when that still fits the time; when it runs over, or
+  // the asking again failed, the earlier timing stands, with its first rides and its start
   let rides: TransitChain | null = null
-  if (timer && timer.state.last && record.totals.timing !== 'estimate' && samePoints(timer.state.last.points, points)) {
-    rides = timer.state.last
-    if (!vias.length && !sameLegs(record, rides.legs)) record = retime(record, rides.legs, asked.dwellMin)
+  if (timer && record.totals.timing !== 'estimate') {
+    const last = timer.state.last
+    if (last && samePoints(last.points, points)) {
+      if (vias.length || sameLegs(record, last.legs)) rides = last
+      else {
+        const re = retime(record, last.legs, asked.dwellMin)
+        if (asked.minutes === null || re.totals.totalMin <= asked.minutes) { record = re; rides = last }
+      }
+    }
+    if (!rides && !vias.length) {
+      const earlier = earlierChain(timer.state.chains, points, record, asked.dwellMin)
+      if (earlier) { rides = earlier; record = retime(record, earlier.legs, asked.dwellMin) }
+    }
   }
 
   const placed = new Set(record.stops.map((s) => s.card))
@@ -142,6 +156,13 @@ export async function solvePath(req: PathRequest, directions: NamedDirections | 
     const lastStop = v2.stops[v2.stops.length - 1]
     const endMin = v2.finish ? v2.finish.arriveMin : lastStop ? lastStop.arriveMin : 0
     const startMs = rides ? rides.startMs : when.kind === 'arriveBy' ? (when.deadlineMs as number) - Math.ceil(endMin) * 60000 : when.startMs
+    // an arrive by whose start comes before now (on the clock's whole minutes) cannot be made
+    if (when.kind === 'arriveBy' && Math.floor(startMs / 60000) < Math.floor(when.nowMs / 60000)) {
+      const earliest = rides && transitRouter
+        ? await leaveNowEnd(transitRouter, when, req.dwellMin, new Set(vias.map((v) => v.at)), rides.points)
+        : when.nowMs + endMin * 60000
+      throw unmetError(when, earliest)
+    }
     v2.clock = clockAt(startMs, when.tz)
   }
   const out: PathPlan = { record: v2, geometry, timingError: v2.totals.timing === 'estimate' ? timingError : null }
@@ -159,6 +180,42 @@ function runOnWalk(directions: NamedDirections | Directions): NamedDirections {
 }
 
 const samePoints = (a: LatLon[], b: LatLon[]) => a.length === b.length && a.every((p, i) => p.lat === b[i].lat && p.lon === b[i].lon)
+
+// The newest timed line whose first points and legs are the record's (plan.ts's timed stops), cut to
+// them: its first rides and its start. Its last leg there ran on to the next ride the longer line
+// took; the record's ends where its own ride arrives. No vias (each leg one pair of points).
+function earlierChain(chains: TransitChain[], points: LatLon[], r: ItineraryRecord, dwell: number): TransitChain | null {
+  const n = points.length - 1
+  for (let k = chains.length - 1; k >= 0; k--) {
+    const c = chains[k]
+    if (c.points.length < points.length || !samePoints(c.points.slice(0, points.length), points)) continue
+    const legs = c.legs.slice(0, n).map((l) => ({ ...l }))
+    if (!sameLegs(r, legs)) continue
+    const trips = c.trips.slice(0, n)
+    const ends = c.startMs + (legs.reduce((a, l) => a + l.min, 0) + dwell * Math.max(0, n - 1)) * 60000
+    const ride = n ? trips[n - 1] : null
+    let endMs = ends
+    if (ride && ends > ride.endTime) {
+      legs[n - 1] = { ...legs[n - 1], min: Math.max(0, legs[n - 1].min - (ends - ride.endTime) / 60000) }
+      endMs = ride.endTime
+    }
+    return { points: c.points.slice(0, points.length), trips, legs, startMs: c.startMs, endMs }
+  }
+  return null
+}
+
+// Leaving now, when the line through these points reaches its end by transit; null when the router
+// finds no way (for an arrive by that cannot be made: what a host can offer instead)
+async function leaveNowEnd(router: TransitRouter, when: ResolvedWhen, dwellMin: number, noDwell: Set<LatLon>, points: LatLon[]): Promise<number | null> {
+  const now: ResolvedWhen = { kind: 'now', tz: when.tz, nowMs: when.nowMs, startMs: when.nowMs, deadlineMs: null, minutes: null }
+  const timer = transitTimer(router, now, dwellMin, noDwell)
+  try {
+    await timer.directions(points)
+  } catch {
+    return null
+  }
+  return timer.state.last ? timer.state.last.endMs : null
+}
 
 const round1 = (x: number) => Math.round(x * 10) / 10
 const roundLeg = (l: Leg): Leg => ({ m: Math.round(l.m), min: round1(l.min) })

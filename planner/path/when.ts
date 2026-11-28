@@ -8,16 +8,46 @@ export type WhenKind = 'now' | 'leaveAt' | 'arriveBy'
 
 export type PlanWhen =
   | { kind: 'now'; tz: string; now?: number }
-  // at: minutes past midnight on tz's clock; date: YYYY-MM-DD there (left out: that clock's today)
+  // at: minutes past midnight on tz's clock; date: YYYY-MM-DD there (left out: the next time at comes on that clock)
   | { kind: 'leaveAt' | 'arriveBy'; tz: string; at: number; date?: string; now?: number }
 
 // A rule checked and read against the clock: when the walk leaves, or when it must arrive, in ms
 export interface ResolvedWhen {
   kind: WhenKind
   tz: string
+  nowMs: number            // the instant the rule was read at (when.now, else the system clock)
   startMs: number          // now and leaveAt: the leave time; arriveBy: now (the earliest it can leave)
   deadlineMs: number | null // arriveBy: the time to arrive by
   minutes: number | null   // the time allowed: as asked, and at most the minutes left before an arrive by
+}
+
+/** A leave at that fell this many minutes ago or less means now: 9:00 asked at 9:05 is leave now */
+export const LEAVE_GRACE_MIN = 15
+
+/** A time on tz's clock, as an instant and as the clock reads it */
+export interface WhenTime {
+  ms: number   // ms since 1970
+  tz: string
+  date: string // YYYY-MM-DD on tz's clock
+  at: number   // whole minutes past midnight there, rounded up (an arrival is never shown early)
+}
+
+/**
+ * Why a time rule cannot stand, so a host can tell the two apart: 'passed', a time with a date that
+ * has passed (an arrive by; a leave at more than LEAVE_GRACE_MIN ago); 'unmet', an arrive by the plan
+ * cannot make, leaving now. An unmet one carries earliestArrival, when it was found: leaving now, when
+ * the plan reaches its end (its last stop with an open end), for a host to offer "leave now, arrive
+ * HH:MM". The message names the field, as every other time-rule error does.
+ */
+export class WhenError extends Error {
+  readonly code: 'passed' | 'unmet'
+  readonly earliestArrival: WhenTime | null
+  constructor(message: string, code: 'passed' | 'unmet', earliestArrival: WhenTime | null = null) {
+    super(message)
+    this.name = 'WhenError'
+    this.code = code
+    this.earliestArrival = earliestArrival
+  }
 }
 
 const KINDS: WhenKind[] = ['now', 'leaveAt', 'arriveBy']
@@ -42,7 +72,7 @@ export function wallOf(ms: number, tz: string): { date: string; min: number; sec
   return { date: `${p.year}-${p.month}-${p.day}`, min: (+p.hour % 24) * 60 + +p.minute, sec: +p.second }
 }
 
-/** The instant a wall clock in tz reads date and min (a minute a spring-forward skips lands an hour on) */
+/** The instant a wall clock in tz reads date and min (a minute a spring-forward skips lands an hour earlier: 02:30 reads 01:30) */
 export function epochOf(date: string, min: number, tz: string): number {
   const [y, m, d] = date.split('-').map(Number)
   const naive = Date.UTC(y, m - 1, d, 0, 0, 0) + min * 60000 // the wall clock read as UTC
@@ -63,10 +93,36 @@ export function clockAt(ms: number, tz: string): PlanClock {
 
 const hhmm = (min: number) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(Math.floor(min % 60)).padStart(2, '0')}`
 
+// The calendar day after a YYYY-MM-DD
+const nextDate = (date: string) => {
+  const [y, m, d] = date.split('-').map(Number)
+  return new Date(Date.UTC(y, m - 1, d + 1)).toISOString().slice(0, 10)
+}
+
+/** An instant as a WhenTime: tz's date, and the minute rounded up */
+export function whenTime(ms: number, tz: string): WhenTime {
+  const w = wallOf(Math.ceil(ms / 60000) * 60000, tz)
+  return { ms, tz, date: w.date, at: w.min }
+}
+
+/** The error for an arrive by the plan cannot make; earliestMs: leaving now, when it reaches its end */
+export function unmetError(when: ResolvedWhen, earliestMs: number | null): WhenError {
+  const by = wallOf(when.deadlineMs as number, when.tz)
+  const earliest = earliestMs === null ? null : whenTime(earliestMs, when.tz)
+  const why = earliest ? `leaving now, the plan arrives ${earliest.date} ${hhmm(earliest.at)}` : 'the plan would leave before now'
+  return new WhenError(`when: arrive by ${by.date} ${hhmm(by.min)} cannot be met: ${why}`, 'unmet', earliest)
+}
+
 /**
  * A time rule checked and read against the clock. Throws an Error naming the field for a rule it
- * cannot read, and for an arrive by that has passed. minutes is the request's: an arrive by keeps
- * it when it fits before the time and cuts it to the minutes left when not (untimed: the minutes left).
+ * cannot read, and a WhenError ('passed') for a time with a date that has passed. minutes is the
+ * request's: an arrive by keeps it when it fits before the time and cuts it to the minutes left when
+ * not (untimed: the minutes left).
+ *
+ * A time with no date is its next time on tz's clock: an arrive by that has passed today is
+ * tomorrow's, as is a leave at that passed more than LEAVE_GRACE_MIN ago; one that passed within
+ * LEAVE_GRACE_MIN means leave now. A time with a date is that day's: an arrive by that has passed
+ * throws, a leave at within LEAVE_GRACE_MIN means now, and one before that throws.
  */
 export function resolveWhen(when: PlanWhen, minutes: number | null): ResolvedWhen {
   const w = when as any
@@ -76,15 +132,28 @@ export function resolveWhen(when: PlanWhen, minutes: number | null): ResolvedWhe
   try { fmtFor(w.tz) } catch { throw new Error(`when.tz: '${w.tz}' is not an IANA time zone`) }
   if (w.now !== undefined && !Number.isFinite(w.now)) throw new Error('when.now: an instant in ms since 1970')
   const nowMs: number = w.now !== undefined ? w.now : Date.now()
-  if (w.kind === 'now') return { kind: 'now', tz: w.tz, startMs: nowMs, deadlineMs: null, minutes }
+  if (w.kind === 'now') return { kind: 'now', tz: w.tz, nowMs, startMs: nowMs, deadlineMs: null, minutes }
 
   if (!Number.isFinite(w.at) || w.at < 0 || w.at >= 24 * 60) throw new Error('when.at: minutes past midnight, 0 to 1439')
   if (w.date !== undefined && (typeof w.date !== 'string' || !DATE_RE.test(w.date))) throw new Error('when.date: YYYY-MM-DD')
-  const date: string = w.date !== undefined ? w.date : wallOf(nowMs, w.tz).date
-  const atMs = epochOf(date, w.at, w.tz)
-  if (w.kind === 'leaveAt') return { kind: 'leaveAt', tz: w.tz, startMs: atMs, deadlineMs: null, minutes }
+  const dated = w.date !== undefined
+  let date: string = dated ? w.date : wallOf(nowMs, w.tz).date
+  let atMs = epochOf(date, w.at, w.tz)
+  if (w.kind === 'leaveAt') {
+    if (atMs < nowMs) {
+      if (nowMs - atMs <= LEAVE_GRACE_MIN * 60000) return { kind: 'leaveAt', tz: w.tz, nowMs, startMs: nowMs, deadlineMs: null, minutes }
+      if (dated) throw new WhenError(`when: leave at ${date} ${hhmm(w.at)} has passed`, 'passed')
+      date = nextDate(date)
+      atMs = epochOf(date, w.at, w.tz)
+    }
+    return { kind: 'leaveAt', tz: w.tz, nowMs, startMs: atMs, deadlineMs: null, minutes }
+  }
 
-  if (atMs <= nowMs) throw new Error(`when: arrive by ${date} ${hhmm(w.at)} has passed`)
+  if (atMs <= nowMs) {
+    if (dated) throw new WhenError(`when: arrive by ${date} ${hhmm(w.at)} has passed`, 'passed')
+    date = nextDate(date)
+    atMs = epochOf(date, w.at, w.tz)
+  }
   const left = Math.floor((atMs - nowMs) / 60000)
-  return { kind: 'arriveBy', tz: w.tz, startMs: nowMs, deadlineMs: atMs, minutes: minutes === null ? left : Math.min(minutes, left) }
+  return { kind: 'arriveBy', tz: w.tz, nowMs, startMs: nowMs, deadlineMs: atMs, minutes: minutes === null ? left : Math.min(minutes, left) }
 }

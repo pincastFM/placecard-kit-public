@@ -13,7 +13,7 @@ import { MODES, meters } from '../path/geo'
 import { toV1, upgradeV1, validateRecord } from '../record'
 import { OTP_PLAN_QUERY, buildOtpPlanQuery, decodePolyline, otpPlanToLegs } from '../path/transit'
 import type { TransitItinerary, TransitRequest } from '../path/transit'
-import { epochOf, wallOf } from '../path/when'
+import { LEAVE_GRACE_MIN, WhenError, epochOf, resolveWhen, wallOf } from '../path/when'
 import * as entry from '../index'
 import { CANDIDATES, DEST, FAR, PATH_CASES, START, streets } from './fixtures/path-cases'
 import { OTP_PLAN, T0 } from './fixtures/otp-plan'
@@ -32,6 +32,8 @@ const quiet = () => vi.spyOn(console, 'error').mockImplementation(() => {})
 
 const NY = 'America/New_York'
 const NOW = Date.UTC(2026, 10, 28, 14, 0) // 9:00 AM in New York
+const UTC9 = Date.UTC(2026, 10, 28, 9, 0) // 9:00 AM UTC, the transit tests' now
+const hh = (min: number) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`
 const V1 = { lat: 40.74, lon: -73.987, label: 'Park' }
 const V2 = { lat: 40.733, lon: -73.984, label: 'Corner' }
 
@@ -104,7 +106,7 @@ describe('modes: walk, run, bike, transit; never a car', () => {
 describe('the time rule: leave now, leave at, arrive by', () => {
   it('leave at: the record\'s clock, and the plan otherwise as without one', async () => {
     const without = await solvePath(caseReq(DEST40), streets(() => 1.2))
-    const p = await solvePath({ ...caseReq(DEST40), when: { kind: 'leaveAt', tz: NY, date: '2026-11-28', at: 615 } }, streets(() => 1.2))
+    const p = await solvePath({ ...caseReq(DEST40), when: { kind: 'leaveAt', tz: NY, date: '2026-11-28', at: 615, now: NOW } }, streets(() => 1.2))
     expect(p.record.clock).toEqual({ tz: NY, date: '2026-11-28', startAt: 615 })
     expect(strip({ ...p.record, clock: null })).toEqual(strip(without.record))
     expect(p.geometry).toEqual(without.geometry)
@@ -151,7 +153,10 @@ describe('the time rule: leave now, leave at, arrive by', () => {
 
   it('an arrive by that has passed, and a rule it cannot read, throw naming the field', async () => {
     const r = caseReq(OPEN30)
-    await expect(solvePath({ ...r, when: { kind: 'arriveBy', tz: NY, at: 8 * 60, now: NOW } }, null)).rejects.toThrow('when: arrive by 2026-11-28 08:00 has passed')
+    const passed = await solvePath({ ...r, when: { kind: 'arriveBy', tz: NY, date: '2026-11-28', at: 8 * 60, now: NOW } }, null).catch((e) => e)
+    expect(passed).toBeInstanceOf(WhenError)
+    expect(passed).toBeInstanceOf(Error)
+    expect([passed.message, passed.code, passed.earliestArrival]).toEqual(['when: arrive by 2026-11-28 08:00 has passed', 'passed', null])
     await expect(solvePath({ ...r, when: { kind: 'later', tz: NY } }, null)).rejects.toThrow("when.kind: 'now', 'leaveAt' or 'arriveBy', not 'later'")
     await expect(solvePath({ ...r, when: { kind: 'now', tz: 'Mars/Olympus' } }, null)).rejects.toThrow("when.tz: 'Mars/Olympus' is not an IANA time zone")
     await expect(solvePath({ ...r, when: { kind: 'now' } }, null)).rejects.toThrow('when.tz: an IANA time zone')
@@ -173,6 +178,66 @@ describe('the time rule: leave now, leave at, arrive by', () => {
   it('a clock is planner output only: v1 has none, and the record without one is 1.6.2\'s', async () => {
     const p = await solvePath({ ...caseReq(OPEN30), when: { kind: 'leaveAt', tz: NY, at: 600 } }, null)
     expect(upgradeV1(toV1(p.record)).clock).toBeNull()
+  })
+
+  // Review of 117a817, fix 2: a time with no date is its next time on the place's clock
+  it('a time with no date is its next time on the clock: an arrive by or a leave at past midnight is tomorrow\'s', async () => {
+    const at2330 = epochOf('2026-11-27', 23 * 60 + 30, NY)
+    const by = resolveWhen({ kind: 'arriveBy', tz: NY, at: 30, now: at2330 }, 30)
+    expect([by.deadlineMs, by.minutes]).toEqual([epochOf('2026-11-28', 30, NY), 30])
+    const p = await solvePath({ ...caseReq(OPEN30), when: { kind: 'arriveBy', tz: NY, at: 30, now: at2330 } }, null)
+    ok(p.record)
+    const last = p.record.stops[p.record.stops.length - 1]
+    expect(p.record.clock).toEqual({ tz: NY, date: '2026-11-28', startAt: 30 - Math.ceil(last.arriveMin) })
+    const at2350 = epochOf('2026-11-27', 23 * 60 + 50, NY)
+    const leave = await solvePath({ ...caseReq(OPEN30), when: { kind: 'leaveAt', tz: NY, at: 15, now: at2350 } }, null)
+    expect(leave.record.clock).toEqual({ tz: NY, date: '2026-11-28', startAt: 15 })
+    // a time still to come today is today's
+    const later = await solvePath({ ...caseReq(OPEN30), when: { kind: 'leaveAt', tz: NY, at: 23 * 60 + 55, now: at2350 } }, null)
+    expect(later.record.clock).toEqual({ tz: NY, date: '2026-11-27', startAt: 23 * 60 + 55 })
+  })
+
+  it(`a leave at with no date that passed ${LEAVE_GRACE_MIN} minutes ago or less is leave now; before that, tomorrow's`, async () => {
+    expect(LEAVE_GRACE_MIN).toBe(15)
+    const at = (min: number) => epochOf('2026-11-28', min, NY)
+    const p = await solvePath({ ...caseReq(OPEN30), when: { kind: 'leaveAt', tz: NY, at: 9 * 60, now: at(9 * 60 + 5) } }, null)
+    expect(p.record.clock).toEqual({ tz: NY, date: '2026-11-28', startAt: 9 * 60 + 5 })
+    expect(resolveWhen({ kind: 'leaveAt', tz: NY, at: 540, now: at(555) }, 30).startMs).toBe(at(555))
+    expect(resolveWhen({ kind: 'leaveAt', tz: NY, at: 540, now: at(555) + 1000 }, 30).startMs).toBe(epochOf('2026-11-29', 540, NY))
+  })
+
+  it('a time with a date is that day\'s: a leave at that passed throws (within the grace, it is now); a later day stands', async () => {
+    const r = caseReq(OPEN30)
+    const err = await solvePath({ ...r, when: { kind: 'leaveAt', tz: NY, date: '2026-11-28', at: 8 * 60, now: NOW } }, null).catch((e) => e)
+    expect(err).toBeInstanceOf(WhenError)
+    expect([err.message, err.code]).toEqual(['when: leave at 2026-11-28 08:00 has passed', 'passed'])
+    const grace = await solvePath({ ...r, when: { kind: 'leaveAt', tz: NY, date: '2026-11-28', at: 9 * 60 - 10, now: NOW } }, null)
+    expect(grace.record.clock).toEqual({ tz: NY, date: '2026-11-28', startAt: 9 * 60 })
+    const tomorrow = await solvePath({ ...r, when: { kind: 'leaveAt', tz: NY, date: '2026-11-29', at: 8 * 60, now: NOW } }, null)
+    expect(tomorrow.record.clock).toEqual({ tz: NY, date: '2026-11-29', startAt: 8 * 60 })
+  })
+
+  it('rolling over a spring-forward night: tomorrow\'s time on the clock, not 24 hours on', () => {
+    const now = epochOf('2026-03-07', 23 * 60 + 30, NY) // 04:30Z on the 8th
+    const by = resolveWhen({ kind: 'arriveBy', tz: NY, at: 3 * 60, now }, null)
+    expect(by.deadlineMs).toBe(Date.UTC(2026, 2, 8, 7, 0)) // 03:00 EDT, two and a half hours on
+    expect(by.minutes).toBe(150)
+    const leave = resolveWhen({ kind: 'leaveAt', tz: NY, at: 3 * 60, now }, null)
+    expect(wallOf(leave.startMs, NY)).toEqual({ date: '2026-03-08', min: 180, sec: 0 })
+  })
+
+  // Review of 117a817, fix 1: an arrive by the plan cannot make throws, and says when it could arrive
+  it('an arrive by the walk cannot make throws WhenError unmet, with its arrival leaving now (estimate and street timing)', async () => {
+    for (const d of [() => null, () => streets(() => 1.2)]) {
+      const asIs = (await solvePath({ ...caseReq(DEST40), minutes: 10 }, d())).record // the plan the rule makes
+      expect(asIs.finish!.arriveMin).toBeGreaterThan(10)
+      const err = await solvePath({ ...caseReq(DEST40), when: { kind: 'arriveBy', tz: NY, at: 9 * 60 + 10, now: NOW } }, d()).catch((e) => e)
+      expect(err).toBeInstanceOf(WhenError)
+      expect(err.code).toBe('unmet')
+      const at = 9 * 60 + Math.ceil(asIs.finish!.arriveMin)
+      expect(err.earliestArrival).toEqual({ ms: NOW + asIs.finish!.arriveMin * 60000, tz: NY, date: '2026-11-28', at })
+      expect(err.message).toBe(`when: arrive by 2026-11-28 09:10 cannot be met: leaving now, the plan arrives 2026-11-28 ${hh(at)}`)
+    }
   })
 })
 
@@ -391,12 +456,28 @@ const asked = (q: TransitRequest) => Date.parse(`${q.date}T${q.time}Z`)
 const toSecond = (ms: number) => Math.floor(ms / 1000) * 1000 // a request names its time to the second
 const toMinute = (ms: number) => Math.floor(ms / 60000) * 60000 // the record's clock counts whole minutes
 const startOf = (c: { date: string; startAt: number }) => Date.parse(`${c.date}T00:00:00Z`) + c.startAt * 60000
+const way = (q: TransitRequest, startTime: number, endTime: number): TransitItinerary => ({
+  m: 300, min: (endTime - startTime) / 60000, startTime, endTime, walkM: 100, waitMin: 0, transfers: 0, legs: [], geometry: [[q.from.lon, q.from.lat], [q.to.lon, q.to.lat]],
+})
+// A router whose way takes 3 minutes, or 100 when slow says so. Arrive by: it arrives at the time
+// asked. Leave: it leaves at the next :05, :15, :25 and so on. From call failFrom on, it fails.
+function rideRouter(slow: (q: TransitRequest, arrive: number) => boolean, failFrom = Infinity) {
+  let n = 0
+  const router = async (q: TransitRequest): Promise<TransitItinerary[]> => {
+    if (++n >= failFrom) throw new Error('OTP 503')
+    const t = asked(q)
+    if (q.arriveBy) return [way(q, t - (slow(q, t) ? 100 : 3) * 60000, t)]
+    const s = Math.ceil((t - 5 * 60000) / 600000) * 600000 + 5 * 60000
+    return [way(q, s, s + (slow(q, s + 3 * 60000) ? 100 : 3) * 60000)]
+  }
+  return Object.assign(router, { calls: () => n })
+}
 
 describe('transit through solvePath: the host\'s router, leg by leg', () => {
   it('leave at: each leg leaves when the one before arrives and the stop\'s minute is up; the record runs on the rides\' times', async () => {
     const log: TransitRequest[] = []
     const base = caseReq(DEST40)
-    const p = await solvePath({ ...base, mode: 'transit', when: { kind: 'leaveAt', tz: 'UTC', date: '2026-11-28', at: 600 } }, null, { transit: cityLine(log) })
+    const p = await solvePath({ ...base, mode: 'transit', when: { kind: 'leaveAt', tz: 'UTC', date: '2026-11-28', at: 600, now: UTC9 } }, null, { transit: cityLine(log) })
     ok(p.record)
     const r = p.record
     expect([r.mode, r.totals.timing]).toEqual(['transit', 'route'])
@@ -451,7 +532,7 @@ describe('transit through solvePath: the host\'s router, leg by leg', () => {
 
   it('through vias: no minute at a via, and the rides beside the record', async () => {
     const log: TransitRequest[] = []
-    const p = await solvePath({ ...caseReq(LOOP45), mode: 'transit', candidates: [], vias: [V1], when: { kind: 'leaveAt', tz: 'UTC', date: '2026-11-28', at: 600 } }, null, { transit: cityLine(log) })
+    const p = await solvePath({ ...caseReq(LOOP45), mode: 'transit', candidates: [], vias: [V1], when: { kind: 'leaveAt', tz: 'UTC', date: '2026-11-28', at: 600, now: UTC9 } }, null, { transit: cityLine(log) })
     ok(p.record)
     expect(p.transit).toHaveLength(2)
     expect(asked(log.at(-1)!)).toBe(toSecond(p.transit![0]!.endTime)) // it leaves the via as it arrives
@@ -461,7 +542,7 @@ describe('transit through solvePath: the host\'s router, leg by leg', () => {
   it('a router that fails or finds no way, or no time rule: the estimate stands, with why, and the clock stands on it', async () => {
     const q = quiet()
     try {
-      const req = { ...caseReq(DEST40), mode: 'transit', when: { kind: 'leaveAt', tz: 'UTC', date: '2026-11-28', at: 600 } }
+      const req = { ...caseReq(DEST40), mode: 'transit', when: { kind: 'leaveAt', tz: 'UTC', date: '2026-11-28', at: 600, now: UTC9 } }
       const down = await solvePath(req, null, { transit: async () => { throw new Error('OTP 503') } })
       expect([down.record.totals.timing, down.timingError, down.transit]).toEqual(['estimate', 'OTP 503', null])
       expect(down.record.clock).toEqual({ tz: 'UTC', date: '2026-11-28', startAt: 600 })
@@ -481,5 +562,74 @@ describe('transit through solvePath: the host\'s router, leg by leg', () => {
     const p = await solvePath(caseReq(OPEN30), null, { transit: router })
     expect(router).not.toHaveBeenCalled()
     expect(Object.keys(p)).toEqual(['record', 'geometry', 'timingError'])
+  })
+
+  // Review of 117a817, fix 1, by transit
+  it('an arrive by no ride can make (its one way leaves before now): WhenError unmet, with the arrival leaving now', async () => {
+    const at = (h: number, m = 0) => Date.UTC(2026, 10, 28, h, m)
+    const router = async (q: TransitRequest) => (q.arriveBy ? [way(q, at(10, 50), at(11, 55))] : [way(q, asked(q) + 10 * 60000, asked(q) + 75 * 60000)])
+    const req = { ...caseReq(DEST40), mode: 'transit', candidates: [], when: { kind: 'arriveBy', tz: 'UTC', date: '2026-11-28', at: 720, now: at(11) } }
+    const err = await solvePath(req, null, { transit: router }).catch((e) => e)
+    expect(err).toBeInstanceOf(WhenError)
+    expect(err.code).toBe('unmet')
+    expect(err.earliestArrival).toEqual({ ms: at(12, 15), tz: 'UTC', date: '2026-11-28', at: 12 * 60 + 15 })
+    expect(err.message).toBe('when: arrive by 2026-11-28 12:00 cannot be met: leaving now, the plan arrives 2026-11-28 12:15')
+    // no way leaving now: nothing to offer
+    const none = await solvePath(req, null, { transit: async (q: TransitRequest) => (q.arriveBy ? router(q) : []) }).catch((e) => e)
+    expect([none.code, none.earliestArrival, none.message]).toEqual(['unmet', null, 'when: arrive by 2026-11-28 12:00 cannot be met: the plan would leave before now'])
+    // asked before that way leaves, it stands
+    const fine = await solvePath({ ...req, when: { ...req.when, now: at(10, 30) } }, null, { transit: router })
+    expect(fine.record.clock).toEqual({ tz: 'UTC', date: '2026-11-28', startAt: 10 * 60 + 50 })
+  })
+
+  // Review of 117a817, fixes 3 and 4: three cards in a line off the start, an open end, 30 minutes with
+  // 5 at each stop. plan.ts's first timing keeps the first two cards (its timed stops), its cuts end on
+  // fewer, and it asks again for those two cards' line.
+  const A = { card: 'A', place: { id: 'a', lat: START.lat + 0.001, lon: START.lon } }
+  const B = { card: 'B', place: { id: 'b', lat: START.lat + 0.002, lon: START.lon } }
+  const C = { card: 'C', place: { id: 'c', lat: START.lat + 0.003, lon: START.lon } }
+  const lineReq = (when: any) => ({ ...caseReq(OPEN30), mode: 'transit', minutes: 30, dwellMin: 5, candidates: [A, B, C], when })
+  const at = (h: number, m = 0) => Date.UTC(2026, 10, 28, h, m)
+  const lateSlow = (_q: TransitRequest, arrive: number) => arrive > at(11, 30) // the reviewer's: arriving after 11:30, 100 minutes
+  const toCSlow = (q: TransitRequest) => q.to.lat === C.place.lat
+
+  it('open, arrive by, asked again on a slower line: the time still holds, on the first timing\'s rides and start', async () => {
+    const router = rideRouter(lateSlow)
+    const p = await solvePath(lineReq({ kind: 'arriveBy', tz: 'UTC', date: '2026-11-28', at: 720, now: UTC9 }), null, { transit: router })
+    expect(router.calls()).toBe(8) // 3, 2, 1 and 0 a round, then 2 asking again
+    ok(p.record)
+    const r = p.record
+    expect([r.stops.map((s) => s.card), r.totals.timing]).toEqual([['A', 'B'], 'route'])
+    expect(r.totals.totalMin).toBeLessThanOrEqual(30)
+    expect(r.stops.map((s) => s.leg.min)).toEqual([3, 3])
+    const rides = p.transit!
+    expect(rides.map((t) => [t!.startTime, t!.endTime])).toEqual([[at(10, 4), at(10, 7)], [at(10, 12), at(10, 15)]])
+    expect(r.clock).toEqual({ tz: 'UTC', date: '2026-11-28', startAt: 10 * 60 + 4 })
+    r.stops.forEach((s, i) => expect(startOf(r.clock!) + s.arriveMin * 60000).toBe(rides[i]!.endTime))
+  })
+
+  it('the router failing when asked again: the record stands on the timing its stops came from, with its rides and its start', async () => {
+    const cases = [
+      { name: 'arrive by', when: { kind: 'arriveBy', tz: 'UTC', date: '2026-11-28', at: 720, now: UTC9 }, slow: lateSlow, rides: [[at(10, 4), at(10, 7)], [at(10, 12), at(10, 15)]], startAt: 604 },
+      // leave at 10:00: each ride leaves at the next :05, so the line waits five minutes at its start
+      { name: 'leave at', when: { kind: 'leaveAt', tz: 'UTC', date: '2026-11-28', at: 600, now: UTC9 }, slow: toCSlow, rides: [[at(10, 5), at(10, 8)], [at(10, 15), at(10, 18)]], startAt: 605 },
+    ]
+    for (const c of cases) {
+      const whole = rideRouter(c.slow)
+      const full = await solvePath(lineReq(c.when), null, { transit: whole })
+      expect(whole.calls(), c.name).toBe(8) // the last two ask again for A and B's line
+      const down = rideRouter(c.slow, 7)
+      const p = await solvePath(lineReq(c.when), null, { transit: down })
+      ok(p.record)
+      const r = p.record
+      expect([r.stops.map((s) => s.card), r.totals.timing], c.name).toEqual([['A', 'B'], 'route'])
+      expect(r.totals.totalMin).toBeLessThanOrEqual(30)
+      const rides = p.transit!
+      expect(rides && rides.map((t) => [t!.startTime, t!.endTime]), c.name).toEqual(c.rides)
+      expect(r.clock, c.name).toEqual({ tz: 'UTC', date: '2026-11-28', startAt: c.startAt })
+      r.stops.forEach((s, i) => expect(startOf(r.clock!) + s.arriveMin * 60000, `${c.name}: stop ${i + 1}`).toBe(rides[i]!.endTime))
+      expect(strip(r)).toEqual(strip(full.record)) // as when asking again worked
+      expect(p.transit).toEqual(full.transit)
+    }
   })
 })

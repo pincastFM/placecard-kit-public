@@ -235,7 +235,7 @@ describe('createTabletop', () => {
     })
     const tt = createTabletop(CONFIG({ app: 'treehopper', modes: { planning: { solver: 'path', transit } } }))
     const base = PATH_CASES.find(x => x.name === 'a destination, planned, 40 min, streets at 1.2').req
-    const req = { ...base, mode: 'transit', candidates: [], when: { kind: 'leaveAt', tz: 'America/New_York', date: '2026-11-28', at: 600 } }
+    const req = { ...base, mode: 'transit', candidates: [], when: { kind: 'leaveAt', tz: 'America/New_York', date: '2026-11-28', at: 600, now: Date.UTC(2026, 10, 28, 14, 0) } }
     const got = await tt.plan(req)
     expect(solvePath).toHaveBeenLastCalledWith(req, null, { transit })
     expect(transit).toHaveBeenCalledTimes(1)

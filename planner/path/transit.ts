@@ -267,7 +267,8 @@ export interface TransitChain {
   points: LatLon[]
   trips: (TransitItinerary | null)[] // one a leg; null where two points are the same place
   legs: Leg[]
-  startMs: number                    // when the line leaves its start
+  startMs: number                    // when the line leaves its start, on the minute (the record's clock)
+  endMs: number                      // when the line reaches its last point
 }
 
 const hms = (ms: number, tz: string) => {
@@ -284,7 +285,8 @@ const hms = (ms: number, tz: string) => {
  * Throws when it has no time rule or a leg has no way, and the estimate stands.
  */
 export function transitTimer(router: TransitRouter, when: ResolvedWhen | null, dwellMin: number, noDwell: Set<LatLon>) {
-  const state: { last: TransitChain | null } = { last: null }
+  // last: the line timed last; chains: every line timed, in order (plan.ts may keep an earlier one's stops)
+  const state: { last: TransitChain | null; chains: TransitChain[] } = { last: null, chains: [] }
   const directions = async (points: LatLon[]): Promise<TimedWalk & { timing: 'route' }> => {
     if (!when) throw new Error('transit: the router needs a time rule (when: now, leaveAt or arriveBy, with its tz)')
     const n = points.length - 1
@@ -305,6 +307,7 @@ export function transitTimer(router: TransitRouter, when: ResolvedWhen | null, d
     }
     const near = (i: number) => meters(points[i], points[i + 1]) < 1
     let startMs: number
+    let endMs: number
     if (when.kind !== 'arriveBy') {
       const leave = when.startMs
       let ready = leave
@@ -324,14 +327,17 @@ export function transitTimer(router: TransitRouter, when: ResolvedWhen | null, d
         }
         ready = Math.max(ready, trip.endTime)
       }
+      endMs = ready
     } else {
       let by = when.deadlineMs as number
       let last = true
+      endMs = by
       for (let i = n - 1; i >= 0; i--) {
         if (!near(i)) {
           const trip = await ask(i, by, true)
           trips[i] = trip
           legs[i] = { m: trip.m, min: (last ? trip.endTime - trip.startTime : Math.max(0, by - trip.startTime)) / 60000 }
+          if (last) endMs = trip.endTime
           last = false
           by = trip.startTime
         }
@@ -346,7 +352,8 @@ export function transitTimer(router: TransitRouter, when: ResolvedWhen | null, d
     if (firstRide >= 0 && onMinute < startMs) legs[firstRide] = { ...legs[firstRide], min: legs[firstRide].min + (startMs - onMinute) / 60000 }
     startMs = onMinute
     const geometry = joinLines(points.slice(1).map((p, i) => trips[i]?.geometry.length ? trips[i]!.geometry : [[points[i].lon, points[i].lat], [p.lon, p.lat]] as [number, number][]))
-    state.last = { points: points.slice(), trips, legs, startMs }
+    state.last = { points: points.slice(), trips, legs, startMs, endMs }
+    state.chains.push(state.last)
     return { legs, geometry, timing: 'route' }
   }
   return { directions, state }
