@@ -2,7 +2,7 @@
 // Built on Treehopper's ItineraryRecord (planVersion 1, planner/path/types.ts), which stays as
 // it is for the records already written. Plain types and two constants; no logic.
 
-export const CONTRACT_VERSION = '1.7.0'
+export const CONTRACT_VERSION = '1.8.0'
 export const PLAN_VERSION_2 = 2
 
 export interface LatLon {
